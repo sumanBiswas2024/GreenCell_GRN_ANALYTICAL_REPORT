@@ -169,7 +169,16 @@ sap.ui.define([
 		},
 
 		onPoSelect: function(oEvent) {
-			var oRow = oEvent.getSource().getBindingContext("poData").getObject();
+			var oTable = this.byId("poTable");
+			var iRow = oEvent.getParameter("rowIndex");
+			if (iRow < 0 || !oTable.isIndexSelected(iRow)) {
+				return;
+			}
+			var oContext = oEvent.getParameter("rowContext") || oTable.getContextByIndex(iRow);
+			var oRow = oContext && oContext.getObject();
+			if (!oRow) {
+				return;
+			}
 			var oDateRange = this._readDateRange();
 			this._notices = {};
 			this._renderNotices();

@@ -77,6 +77,7 @@ body,
     flex-direction: row;
     gap: .5rem;
     padding-bottom: .05rem;
+    marigin-left:10rem;
 }
 
 .filterHint {
@@ -211,22 +212,22 @@ body,
     align-items: stretch;
     flex-wrap: nowrap !important;
     gap: .75rem;
-    height: 36rem;
-    min-height: 36rem;
+    height: 30rem;
+    min-height: 30rem;
 }
 
 .dashboardDetails {
     flex: 0 0 calc(55% - .4rem);
     width: calc(55% - .4rem);
     min-width: 0;
-    height: 36rem;
+    height: 30rem;
 }
 
 .dashboardCharts {
     flex: 1 1 0;
     width: 0;
     min-width: 0;
-    height: 36rem;
+    height: 30rem;
     gap: .75rem;
 }
 
@@ -245,7 +246,7 @@ body,
 
 .dashboardDetails .miniPanel {
     flex: 1 1 auto;
-    height: 36rem;
+    height: 30rem;
 }
 
 .dashboardDetails .miniPanel .sapMPanelContent {
@@ -258,8 +259,7 @@ body,
 
 .dashboardCharts .miniPanel {
     flex: 0 0 17.6rem;
-    min-height: 17.6rem;
-    height: 17.6rem;
+    
 }
 
 .miniPanel .sapMPanelContent {
@@ -279,7 +279,7 @@ body,
     min-height: 0;
 }
 
-.plantDetailsTable {
+.fixedDataTable {
     width: 100%;
 }
 
@@ -291,23 +291,23 @@ body,
     padding: 0;
 }
 
-.plantDetailsTable .sapUiTableCnt {
+.fixedDataTable .sapUiTableCnt {
     border: 0;
 }
 
-.plantDetailsTable .sapUiTableColHdrCnt,
-.plantDetailsTable .sapUiTableCtrlScr {
+.fixedDataTable .sapUiTableColHdrCnt,
+.fixedDataTable .sapUiTableCtrlScr {
     background: #fff;
 }
 
-.plantDetailsTable .sapUiTableCol .sapMLabel {
+.fixedDataTable .sapUiTableCol .sapMLabel {
     color: #345573;
     font-size: .75rem;
     font-weight: 700;
 }
 
-.plantDetailsTable .sapUiTableVSb,
-.plantDetailsTable .sapUiTableHSb {
+.fixedDataTable .sapUiTableVSb,
+.fixedDataTable .sapUiTableHSb {
     visibility: visible !important;
     opacity: 1 !important;
 }
@@ -520,7 +520,7 @@ body,
         width: 100%;
     }
     .plantDetailsPanel.sapMPanel {
-        height: 36rem !important;
+        height: 30rem !important;
     }
     .plantDetailsPanel .sapMPanelContent {
         height: 32rem;

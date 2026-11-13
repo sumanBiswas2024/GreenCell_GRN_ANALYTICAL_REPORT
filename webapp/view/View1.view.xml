@@ -14,7 +14,7 @@
 						<Label text="Report filters" class="sectionEyebrow"/>
 						<HBox wrap="Wrap" class="filterRow">
 							<VBox class="filterField"><Label text="Plant"/>
-								<Input id="plantInput" placeholder="All plants or enter a plant" showSuggestion="true" filterSuggests="true" startSuggestion="1"
+								<Input id="plantInput" placeholder="Enter a plant" showSuggestion="true" filterSuggests="true" startSuggestion="1"
 									suggestionItemSelected="onPlantSuggestionSelected" suggestionItems="{plantChoices>/rows}">
 									<suggestionItems><core:ListItem key="{plantChoices>werks}" text="{plantChoices>werks}" additionalText="{plantChoices>plant_name}"/></suggestionItems>
 								</Input>
@@ -49,25 +49,25 @@
 							</HBox>
 							<HBox wrap="NoWrap" class="plantDashboard">
 								<VBox class="dashboardDetails">
-									<Panel class="miniPanel plantDetailsPanel" height="36rem" expandable="false">
+									<Panel class="miniPanel plantDetailsPanel" height="30rem" expandable="false">
 										<headerToolbar>
 											<Toolbar><Title text="Plant-wise Details" level="H3"/></Toolbar>
 										</headerToolbar>
 										<content>
-											<table:Table id="plantTable" class="plantDetailsTable" rows="{plantData>/rows}" width="100%" height="45rem" visibleRowCount="14"
-												visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPlantSelect" enableColumnReordering="false"
-												enableBusyIndicator="true" busyIndicatorDelay="150">
+											<table:Table id="plantTable" class="fixedDataTable plantDetailsTable" rows="{plantData>/rows}" width="100%" height="40rem"
+												visibleRowCount="11" visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPlantSelect"
+												enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
 												<table:noData><Text text="No plant records found"/></table:noData>
 												<table:columns>
-													<table:Column width="7rem" hAlign="Begin">
+													<table:Column width="6rem" hAlign="Begin">
 														<table:label><Label text="Plant"/></table:label>
 														<table:template><ObjectIdentifier title="{plantData>werks}"/></table:template>
 													</table:Column>
-													<table:Column width="11rem" hAlign="Begin">
+													<table:Column width="12rem" hAlign="Begin">
 														<table:label><Label text="Plant Description"/></table:label>
 														<table:template><Text text="{plantData>plant_name}" wrapping="false"/></table:template>
 													</table:Column>
-													<table:Column width="7rem" hAlign="End">
+													<table:Column width="5rem" hAlign="End">
 														<table:label><Label text="Total POs"/></table:label>
 														<table:template><ObjectNumber number="{plantData>ebeln}"/></table:template>
 													</table:Column>
@@ -97,7 +97,7 @@
 									</Panel>
 								</VBox>
 								<VBox class="dashboardCharts">
-									<Panel id="statusChartPanel" class="miniPanel chartPanel statusChartPanel" height="17.6rem" expandable="false">
+									<Panel id="statusChartPanel" class="miniPanel chartPanel statusChartPanel" height="14rem" expandable="false">
 										<headerToolbar>
 											<Toolbar><Title id="statusChartTitle" text="Document Status" level="H3"/><ToolbarSpacer/><Text text="{statusChart>/total} documents"/></Toolbar>
 										</headerToolbar>
@@ -112,7 +112,7 @@
 											</HBox>
 										</content>
 									</Panel>
-									<Panel id="topPlantChartPanel" class="miniPanel chartPanel topPlantsPanel" height="17.6rem" expandable="false">
+									<Panel id="topPlantChartPanel" class="miniPanel chartPanel topPlantsPanel" height="16rem" expandable="false">
 										<headerToolbar>
 											<Toolbar><Title id="topPlantChartTitle" text="Top 5 Plants by Total Documents" level="H3"/></Toolbar>
 										</headerToolbar>
@@ -132,62 +132,148 @@
 						<headerToolbar>
 							<Toolbar><core:Icon src="sap-icon://shipping-status"/><Title id="poTitle" text="PO-wise Summary" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPlant" text="All plants" state="Information"/></Toolbar>
 						</headerToolbar>
-						<Table id="poTable" items="{poData>/rows}" growing="true" growingScrollToLoad="true" growingThreshold="50" enableBusyIndicator="true"
-							busyIndicatorDelay="150" noDataText="Select a plant to load purchase orders">
-							<columns>
-								<Column><Text text="PO Number"/></Column>
-								<Column><Text text="Vendor"/></Column>
-								<Column><Text text="Vendor Name"/></Column>
-								<Column><Text text="PO Date"/></Column>
-								<Column hAlign="End"><Text text="GRN Docs"/></Column>
-								<Column hAlign="End"><Text text="103"/></Column>
-								<Column hAlign="End"><Text text="105"/></Column>
-								<Column hAlign="End"><Text text="Completed"/></Column>
-								<Column hAlign="End"><Text text="Pending"/></Column>
-								<Column hAlign="End"><Text text="Rejected"/></Column>
-								<Column hAlign="End"><Text text="Cancelled"/></Column>
-								<Column><Text text="Storage Location"/></Column>
-							</columns>
-							<items>
-								<ColumnListItem type="Navigation" press="onPoSelect">
-									<cells><ObjectIdentifier title="{poData>ebeln}"/><Text text="{poData>lifnr}"/><Text text="{poData>lifnr_name}"/><Text text="{poData>bedat}"/><ObjectNumber number="{poData>mblnr}"/><Text text="{poData>mblnr_103}"/><Text text="{poData>mblnr_105}"/><ObjectNumber number="{poData>completed}" state="Success"/><ObjectNumber number="{poData>pending}" state="Warning"/><ObjectNumber number="{poData>rejected}" state="Error"/><Text text="{poData>cancelled}"/><Text text="{poData>lgort}"/></cells>
-								</ColumnListItem>
-							</items>
-						</Table>
+						<table:Table id="poTable" class="fixedDataTable" rows="{poData>/rows}" width="100%" height="25rem" visibleRowCount="10"
+							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPoSelect" enableColumnReordering="false"
+							enableBusyIndicator="true" busyIndicatorDelay="150">
+							<table:noData><Text text="Select a plant to load purchase orders"/></table:noData>
+							<table:columns>
+								<table:Column width="10rem">
+									<table:label><Label text="PO Number"/></table:label>
+									<table:template><ObjectIdentifier title="{poData>ebeln}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem">
+									<table:label><Label text="Vendor"/></table:label>
+									<table:template><Text text="{poData>lifnr}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="15rem">
+									<table:label><Label text="Vendor Name"/></table:label>
+									<table:template><Text text="{poData>lifnr_name}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="9rem">
+									<table:label><Label text="PO Date"/></table:label>
+									<table:template><Text text="{poData>bedat}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem" hAlign="End">
+									<table:label><Label text="GRN Docs"/></table:label>
+									<table:template><ObjectNumber number="{poData>mblnr}"/></table:template>
+								</table:Column>
+								<table:Column width="6rem" hAlign="End">
+									<table:label><Label text="103"/></table:label>
+									<table:template><Text text="{poData>mblnr_103}"/></table:template>
+								</table:Column>
+								<table:Column width="6rem" hAlign="End">
+									<table:label><Label text="105"/></table:label>
+									<table:template><Text text="{poData>mblnr_105}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem" hAlign="End">
+									<table:label><Label text="Completed"/></table:label>
+									<table:template><ObjectNumber number="{poData>completed}" state="Success"/></table:template>
+								</table:Column>
+								<table:Column width="7rem" hAlign="End">
+									<table:label><Label text="Pending"/></table:label>
+									<table:template><ObjectNumber number="{poData>pending}" state="Warning"/></table:template>
+								</table:Column>
+								<table:Column width="7rem" hAlign="End">
+									<table:label><Label text="Rejected"/></table:label>
+									<table:template><ObjectNumber number="{poData>rejected}" state="Error"/></table:template>
+								</table:Column>
+								<table:Column width="7rem" hAlign="End">
+									<table:label><Label text="Cancelled"/></table:label>
+									<table:template><Text text="{poData>cancelled}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="Storage Location"/></table:label>
+									<table:template><Text text="{poData>lgort}"/></table:template>
+								</table:Column>
+							</table:columns>
+						</table:Table>
 					</Panel>
 					<Panel id="grnPanel" class="dataPanel" expandable="false">
 						<headerToolbar>
 							<Toolbar><core:Icon src="sap-icon://document-text"/><Title id="grnTitle" text="GRN / Material Document Details" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPo" text="Select a PO" state="Information"/></Toolbar>
 						</headerToolbar>
-						<Table id="grnTable" items="{grnData>/rows}" growing="true" growingScrollToLoad="true" growingThreshold="50" enableBusyIndicator="true"
-							busyIndicatorDelay="150" noDataText="Select a plant and PO to load GRN documents">
-							<columns>
-								<Column><Text text="Material Document"/></Column>
-								<Column><Text text="Movement"/></Column>
-								<Column><Text text="Reference Doc."/></Column>
-								<Column><Text text="Invoice"/></Column>
-								<Column><Text text="Material"/></Column>
-								<Column minScreenWidth="Tablet" demandPopin="true"><Text text="Description"/></Column>
-								<Column><Text text="UoM"/></Column>
-								<Column hAlign="End"><Text text="PO Qty"/></Column>
-								<Column hAlign="End"><Text text="GRN Qty"/></Column>
-								<Column hAlign="End"><Text text="Invoice Qty"/></Column>
-								<Column hAlign="End"><Text text="Rejection Qty"/></Column>
-								<Column><Text text="Status"/></Column>
-								<Column><Text text="GRN Date"/></Column>
-								<Column><Text text="Post Date"/></Column>
-								<Column><Text text="Time"/></Column>
-								<Column><Text text="Storage"/></Column>
-								<Column><Text text="GRN User"/></Column>
-								<Column minScreenWidth="Tablet" demandPopin="true"><Text text="Remarks"/></Column>
-								<Column hAlign="End"><Text text="Ageing (Days)"/></Column>
-							</columns>
-							<items>
-								<ColumnListItem>
-									<cells><Text text="{grnData>mblnr}"/><Text text="{grnData>bwart}"/><Text text="{grnData>lfbnr}"/><Text text="{grnData>xblnr}"/><Text text="{grnData>matnr}"/><Text text="{grnData>maktx}"/><Text text="{grnData>meins}"/><Text text="{grnData>menge}"/><Text text="{grnData>acqty}"/><Text text="{grnData>menge_i}"/><Text text="{grnData>rjqty}"/><ObjectStatus text="{grnData>status}"/><Text text="{grnData>budat}"/><Text text="{grnData>budat_mkpf}"/><Text text="{grnData>cputm}"/><Text text="{grnData>lgort}"/><Text text="{grnData>usnam}"/><Text text="{grnData>bktxt}"/><Text text="{grnData>vend_age}"/></cells>
-								</ColumnListItem>
-							</items>
-						</Table>
+						<table:Table id="grnTable" class="fixedDataTable" rows="{grnData>/rows}" width="100%" height="25rem" visibleRowCount="10"
+							visibleRowCountMode="Fixed" selectionMode="None" enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
+							<table:noData><Text text="Select a plant and PO to load GRN documents"/></table:noData>
+							<table:columns>
+								<table:Column width="10rem">
+									<table:label><Label text="Material Document"/></table:label>
+									<table:template><Text text="{grnData>mblnr}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="7rem">
+									<table:label><Label text="Movement"/></table:label>
+									<table:template><Text text="{grnData>bwart}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="Reference Doc."/></table:label>
+									<table:template><Text text="{grnData>lfbnr}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="Invoice"/></table:label>
+									<table:template><Text text="{grnData>xblnr}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="12rem">
+									<table:label><Label text="Material"/></table:label>
+									<table:template><Text text="{grnData>matnr}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="20rem">
+									<table:label><Label text="Description"/></table:label>
+									<table:template><Text text="{grnData>maktx}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="6rem">
+									<table:label><Label text="UoM"/></table:label>
+									<table:template><Text text="{grnData>meins}"/></table:template>
+								</table:Column>
+								<table:Column width="9rem" hAlign="End">
+									<table:label><Label text="PO Qty"/></table:label>
+									<table:template><Text text="{grnData>menge}"/></table:template>
+								</table:Column>
+								<table:Column width="9rem" hAlign="End">
+									<table:label><Label text="GRN Qty"/></table:label>
+									<table:template><Text text="{grnData>acqty}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem" hAlign="End">
+									<table:label><Label text="Invoice Qty"/></table:label>
+									<table:template><Text text="{grnData>menge_i}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem" hAlign="End">
+									<table:label><Label text="Rejection Qty"/></table:label>
+									<table:template><Text text="{grnData>rjqty}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem">
+									<table:label><Label text="Status"/></table:label>
+									<table:template><ObjectStatus text="{grnData>status}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="GRN Date"/></table:label>
+									<table:template><Text text="{grnData>budat}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="Post Date"/></table:label>
+									<table:template><Text text="{grnData>budat_mkpf}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem">
+									<table:label><Label text="Time"/></table:label>
+									<table:template><Text text="{grnData>cputm}"/></table:template>
+								</table:Column>
+								<table:Column width="8rem">
+									<table:label><Label text="Storage"/></table:label>
+									<table:template><Text text="{grnData>lgort}"/></table:template>
+								</table:Column>
+								<table:Column width="10rem">
+									<table:label><Label text="GRN User"/></table:label>
+									<table:template><Text text="{grnData>usnam}"/></table:template>
+								</table:Column>
+								<table:Column width="20rem">
+									<table:label><Label text="Remarks"/></table:label>
+									<table:template><Text text="{grnData>bktxt}" wrapping="false"/></table:template>
+								</table:Column>
+								<table:Column width="10rem" hAlign="End">
+									<table:label><Label text="Ageing (Days)"/></table:label>
+									<table:template><Text text="{grnData>vend_age}"/></table:template>
+								</table:Column>
+							</table:columns>
+						</table:Table>
 						<Toolbar class="tableFooter"><Text id="grnFooter" text="Select a PO to view its GRN documents."/><ToolbarSpacer/><Button text="Download CSV" icon="sap-icon://excel-attachment" press="onExport"/></Toolbar>
 					</Panel>
 				</VBox>
