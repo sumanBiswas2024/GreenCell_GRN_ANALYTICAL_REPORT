@@ -54,7 +54,7 @@
 											<Toolbar><Title text="Plant-wise Details" level="H3"/></Toolbar>
 										</headerToolbar>
 										<content>
-											<table:Table id="plantTable" class="plantDetailsTable" rows="{plantData>/rows}" width="100%" height="31rem" visibleRowCount="12"
+											<table:Table id="plantTable" class="plantDetailsTable" rows="{plantData>/rows}" width="100%" height="45rem" visibleRowCount="14"
 												visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPlantSelect" enableColumnReordering="false"
 												enableBusyIndicator="true" busyIndicatorDelay="150">
 												<table:noData><Text text="No plant records found"/></table:noData>
@@ -97,22 +97,30 @@
 									</Panel>
 								</VBox>
 								<VBox class="dashboardCharts">
-										<Panel id="statusChartPanel" class="miniPanel chartPanel statusChartPanel" height="17.6rem" expandable="false">
-										<headerToolbar><Toolbar><Title id="statusChartTitle" text="Document Status" level="H3"/><ToolbarSpacer/><Text text="{statusChart>/total} documents"/></Toolbar></headerToolbar>
+									<Panel id="statusChartPanel" class="miniPanel chartPanel statusChartPanel" height="17.6rem" expandable="false">
+										<headerToolbar>
+											<Toolbar><Title id="statusChartTitle" text="Document Status" level="H3"/><ToolbarSpacer/><Text text="{statusChart>/total} documents"/></Toolbar>
+										</headerToolbar>
 										<content>
 											<HBox class="statusChartBody" alignItems="Center" justifyContent="Center">
 												<core:HTML class="statusDonutHost" content="{statusChart>/donutHtml}" sanitizeContent="false"/>
 												<VBox class="statusLegend" items="{statusChart>/rows}">
-													<items><HBox class="statusLegendRow" alignItems="Center"><ObjectStatus text="{statusChart>status}" state="{statusChart>state}"/><ToolbarSpacer/><Text text="{statusChart>countText}"/><Text text="{statusChart>percentText}" class="statusPercent"/></HBox></items>
+													<items>
+														<HBox class="statusLegendRow" alignItems="Center"><ObjectStatus text="{statusChart>status}" state="{statusChart>state}"/><ToolbarSpacer/><Text text="{statusChart>countText}"/><Text text="{statusChart>percentText}" class="statusPercent"/></HBox>
+													</items>
 												</VBox>
 											</HBox>
 										</content>
 									</Panel>
-										<Panel id="topPlantChartPanel" class="miniPanel chartPanel topPlantsPanel" height="17.6rem" expandable="false">
-										<headerToolbar><Toolbar><Title id="topPlantChartTitle" text="Top 5 Plants by Total Documents" level="H3"/></Toolbar></headerToolbar>
+									<Panel id="topPlantChartPanel" class="miniPanel chartPanel topPlantsPanel" height="17.6rem" expandable="false">
+										<headerToolbar>
+											<Toolbar><Title id="topPlantChartTitle" text="Top 5 Plants by Total Documents" level="H3"/></Toolbar>
+										</headerToolbar>
 										<content>
 											<VBox class="topPlantsChart" items="{topPlantChart>/rows}">
-												<items><HBox class="topPlantRow" alignItems="Center"><Text text="{topPlantChart>plant}" class="topPlantLabel"/><ProgressIndicator percentValue="{topPlantChart>percent}" displayValue="" state="Information" class="topPlantBar"/><Text text="{topPlantChart>documentsText}" class="topPlantValue"/></HBox></items>
+												<items>
+													<HBox class="topPlantRow" alignItems="Center"><Text text="{topPlantChart>plant}" class="topPlantLabel"/><core:HTML class="topPlantBarHost" content="{topPlantChart>barHtml}" sanitizeContent="false"/><Text text="{topPlantChart>documentsText}" class="topPlantValue"/></HBox>
+												</items>
 											</VBox>
 										</content>
 									</Panel>

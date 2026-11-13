@@ -333,12 +333,25 @@ body,
 }
 
 .statusDonut {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 9rem;
     height: 9rem;
     border-radius: 50%;
+}
+
+.statusDonutPct {
+    position: absolute;
+    z-index: 1;
+    color: #fff;
+    font-size: .62rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(20, 45, 66, .75);
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
 }
 
 .statusDonutCenter {
@@ -355,13 +368,14 @@ body,
 }
 
 .statusDonutCenter strong {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
+    font-weight: 700;
     line-height: 1.35;
 }
 
 .statusDonutCenter span {
-    color: #526a80;
-    font-size: .68rem;
+    color: #334f68;
+    font-size: .78rem;
 }
 
 .statusLegend {
@@ -370,59 +384,81 @@ body,
 }
 
 .statusLegendRow {
-    min-height: 1.75rem;
-    gap: .35rem;
+    min-height: 1.9rem;
+    display: grid !important;
+    grid-template-columns: 5.4rem minmax(0, 1fr) 3rem 2.2rem;
+    align-items: center;
+    gap: .25rem;
     white-space: nowrap;
 }
 
-.statusLegendRow .sapMObjStatusText,
+.statusLegendRow .sapMObjStatusText {
+    font-size: .72rem;
+    font-weight: 600;
+}
+
 .statusLegendRow .sapMText {
-    font-size: .68rem;
+    color: #243e55;
+    font-size: .72rem;
+    font-weight: 500;
 }
 
 .statusPercent {
-    min-width: 2.2rem;
     color: #63788b;
     text-align: end;
 }
 
 .topPlantsChart {
-    justify-content: center;
-    gap: .55rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: .2rem;
 }
 
 .topPlantRow {
     width: 100%;
-    gap: .45rem;
+    flex: 0 0 2rem;
+    height: 2rem;
+    min-height: 2rem;
+    display: grid !important;
+    grid-template-columns: 2.7rem minmax(5rem, 1fr) 2.6rem;
+    align-items: center;
+    gap: .55rem;
 }
 
 .topPlantLabel {
-    flex: 0 0 3.5rem;
-    color: #3c5871;
+    flex: 0 0 2.7rem;
+    color: #294b68;
     font-size: .72rem;
+    font-weight: 600;
 }
 
-.topPlantBar {
-    flex: 1 1 auto;
-    min-width: 3rem;
+.topPlantBarHost.sapUiHtm {
+    display: block;
+    min-width: 5rem;
+    width: 100%;
 }
 
-.topPlantBar .sapMPI {
-    height: .8rem;
-    border: 0;
+.topPlantTrack {
+    width: 100%;
+    height: .9rem;
     border-radius: .15rem;
-    background: #edf2f7;
+    background: #e8eff6;
+    overflow: hidden;
 }
 
-.topPlantBar .sapMPIBar {
+.topPlantTrack span {
+    display: block;
+    height: 100%;
     border-radius: .15rem;
-    background: #318bd0;
+    background: linear-gradient(90deg, #2482c7, #45a6e3);
 }
 
 .topPlantValue {
-    flex: 0 0 2.7rem;
-    color: #2e4b63;
+    flex: 0 0 2.6rem;
+    color: #294b68;
     font-size: .72rem;
+    font-weight: 600;
     text-align: end;
 }
 

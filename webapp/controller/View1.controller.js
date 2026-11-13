@@ -155,6 +155,7 @@ sap.ui.define([
 			this._notices = {};
 			this._renderNotices();
 			this._activePlant = oRow.werks;
+			this._updateCharts([oRow]);
 			this._activePo = "";
 			this.byId("plantInput").setValue(oRow.werks);
 			this.byId("poInput").setValue("");
@@ -332,7 +333,7 @@ sap.ui.define([
 						if (iRequestId !== this._allPlantsRequestId) {
 							return;
 						}
-							this._endMainBusy("plantAll");
+						this._endMainBusy("plantAll");
 						this._allPlantsLoading = false;
 						this._allPlantsLoaded = true;
 						this._allPlantRows = oData && Array.isArray(oData.results) ? oData.results : [];
@@ -353,7 +354,7 @@ sap.ui.define([
 						if (iRequestId !== this._allPlantsRequestId) {
 							return;
 						}
-							this._endMainBusy("plantAll");
+						this._endMainBusy("plantAll");
 						this._allPlantsLoading = false;
 						if (!this._requestActive.plantData) {
 							this.byId("plantTable").setBusy(false);
@@ -427,17 +428,29 @@ sap.ui.define([
 					return iSum + this._num(oRow[oStatus.key]);
 				}.bind(this), 0);
 			}.bind(this));
-			var iStatusTotal = aStatus.reduce(function(iSum, oStatus) { return iSum + oStatus.value; }, 0);
+			var iStatusTotal = aStatus.reduce(function(iSum, oStatus) {
+				return iSum + oStatus.value;
+			}, 0);
 			var iRunningPercent = 0;
+			var aDonutLabels = [];
 			var sGradient = aStatus.map(function(oStatus, iIndex) {
 				var iStart = iRunningPercent;
 				var iEnd = iIndex === aStatus.length - 1 ? 100 : (iStatusTotal ? iStart + oStatus.value / iStatusTotal * 100 : iStart);
+				var iSlicePercent = iStatusTotal ? Math.round(oStatus.value / iStatusTotal * 100) : 0;
+				if (iSlicePercent > 0) {
+					var iMidAngle = (((iStart + iEnd) / 2) * 3.6 - 90) * Math.PI / 180;
+					var iLeft = 50 + Math.cos(iMidAngle) * 42;
+					var iTop = 50 + Math.sin(iMidAngle) * 42;
+					aDonutLabels.push("<span class='statusDonutPct' style='left:" + iLeft.toFixed(1) + "%;top:" + iTop.toFixed(1) + "%'>" +
+						iSlicePercent + "%</span>");
+				}
 				iRunningPercent = iEnd;
 				return oStatus.color + " " + iStart.toFixed(2) + "% " + iEnd.toFixed(2) + "%";
 			}).join(", ");
 			var oStatusModel = this.getView().getModel("statusChart");
 			oStatusModel.setProperty("/total", this._formatCount(iStatusTotal));
-			oStatusModel.setProperty("/donutHtml", "<div class='statusDonut' style='background:conic-gradient(" + sGradient + ")'><div class='statusDonutCenter'><strong>" + this._formatCount(iStatusTotal) + "</strong><span>Documents</span></div></div>");
+			oStatusModel.setProperty("/donutHtml", "<div class='statusDonut' style='background:conic-gradient(" + sGradient +
+				")'>" + aDonutLabels.join("") + "<div class='statusDonutCenter'><strong>" + this._formatCount(iStatusTotal) + "</strong><span>Documents</span></div></div>");
 			oStatusModel.setProperty("/rows", aStatus.map(function(oStatus) {
 				var iPercent = iStatusTotal ? Math.round(oStatus.value / iStatusTotal * 100) : 0;
 				return {
@@ -454,10 +467,11 @@ sap.ui.define([
 			var iMaxDocuments = aTop.length ? this._num(aTop[0].belnr) : 0;
 			this.getView().getModel("topPlantChart").setProperty("/rows", aTop.map(function(oRow) {
 				var iDocuments = this._num(oRow.belnr);
+				var iPercent = iMaxDocuments ? iDocuments / iMaxDocuments * 100 : 0;
 				return {
 					plant: oRow.werks || "",
 					documentsText: this._formatCount(iDocuments),
-					percent: iMaxDocuments ? iDocuments / iMaxDocuments * 100 : 0
+					barHtml: "<div class='topPlantTrack'><span style='width:" + iPercent.toFixed(1) + "%'></span></div>"
 				};
 			}.bind(this)));
 		},
@@ -562,17 +576,23 @@ sap.ui.define([
 		},
 
 		_beginMainBusy: function(sKey) {
-			if (this._mainBusyRequests[sKey]) { return; }
+			if (this._mainBusyRequests[sKey]) {
+				return;
+			}
 			this._mainBusyRequests[sKey] = true;
 			this._mainBusyCount++;
 			this.byId("reportPage").setBusy(true);
 		},
 
 		_endMainBusy: function(sKey) {
-			if (!this._mainBusyRequests[sKey]) { return; }
+			if (!this._mainBusyRequests[sKey]) {
+				return;
+			}
 			delete this._mainBusyRequests[sKey];
 			this._mainBusyCount = Math.max(0, this._mainBusyCount - 1);
-			if (this._mainBusyCount === 0) { this.byId("reportPage").setBusy(false); }
+			if (this._mainBusyCount === 0) {
+				this.byId("reportPage").setBusy(false);
+			}
 		},
 
 		_setRows: function(sName, aRows) {
