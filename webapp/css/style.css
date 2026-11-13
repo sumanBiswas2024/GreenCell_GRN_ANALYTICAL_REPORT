@@ -1,38 +1,492 @@
-html, body, #content { height: 100%; }
-.reportRoot { min-width: 0; padding: 0 1rem 1.25rem; background: #f2f6fa; }
-.reportHeader.sapMTB { min-height: 3.5rem; margin: 0 -1rem 1rem; padding: 0 1.25rem; color: #fff; background: linear-gradient(105deg, #123d68, #205b8c); border: 0; box-shadow: 0 2px 7px rgba(22, 52, 79, .2); }
-.reportHeader .sapMTitle { color: #fff; font-size: 1.2rem; font-weight: 700; }
-.reportHeader .sapMBtnIcon { color: #fff; }
-.filterPanel { padding: .8rem 1rem .65rem; margin-bottom: .75rem; background: #fff; border: 1px solid #d8e2ec; border-radius: .45rem; box-shadow: 0 1px 2px rgba(29, 60, 90, .04); }
-.sectionEyebrow { margin-bottom: .45rem; color: #516a82; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
-.filterRow { align-items: end; gap: .75rem; }
-.filterField { flex: 1 1 13rem; max-width: 21rem; }
-.filterField .sapMLabel { margin-bottom: .25rem; color: #42596f; font-size: .75rem; font-weight: 600; }
-.filterActions { display: flex; flex-direction: row; gap: .5rem; padding-bottom: .05rem; }
-.filterHint { margin-top: .55rem; color: #64788c; font-size: .75rem; }
-.kpiRow { gap: .65rem; margin-bottom: .75rem; }
-.kpiCard { box-sizing: border-box; flex: 1 1 9rem; min-width: 9rem; padding: .7rem .85rem; border-radius: .4rem; color: #fff; box-shadow: 0 2px 5px rgba(24, 55, 82, .12); }
-.kpiLabel { margin-bottom: .25rem; color: rgba(255,255,255,.85); font-size: .68rem; font-weight: 700; letter-spacing: .04em; }
-.kpiCard .sapMObjectNumberText, .kpiCard .sapMObjectNumberUnit { color: #fff; }
-.kpiBlue { background: #287fc1; }.kpiCyan { background: #3b9cce; }.kpiTeal { background: #159b95; }
-.kpiGreen { background: #55a978; }.kpiAmber { background: #e9a533; }.kpiRed { background: #d85b68; }
-.dataPanel.sapMPanel { margin-bottom: .75rem; border: 1px solid #d8e2ec; border-radius: .45rem; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(29, 60, 90, .04); }
-.dataPanel .sapMPanelHdr, .dataPanel .sapMTB { background: #fff; }
-.dataPanel .sapMPanelContent { padding: 0; }
-.dataPanel .sapMPanelWrappingDivTb { border-bottom: 1px solid #e3eaf1; }
-.dataPanel .sapMTitle { color: #184f7d; font-weight: 700; }
-.dataPanel .sapMListTblHeaderCell { background: #f3f7fb; border-color: #dce5ee; }
-.dataPanel .sapMListTblHeaderCell .sapMText { color: #345573; font-size: .75rem; font-weight: 700; }
-.dataPanel .sapMListTblCell { border-color: #e5ebf1; }
-.dataPanel .sapMListTblRow:hover { background: #edf6fd; }
-.tableFooter.sapMTB { min-height: 2.8rem; border-top: 1px solid #e3eaf1; }
-.tableFooter .sapMText { color: #526a80; font-size: .75rem; }
-.messageStrip { margin-bottom: .75rem; }
+html,
+body,
+#content {
+    height: 100%;
+}
+
+.reportRoot {
+    min-width: 0;
+    min-height: 100%;
+    padding: 0 1rem 1.25rem;
+    background: #f4f7fb;
+}
+
+.reportHeader.sapMTB {
+    min-height: 3.75rem;
+    margin: 0 -1rem 1rem;
+    padding: 0 1.25rem;
+    color: #fff;
+    background: linear-gradient(105deg, #173f66, #176e9b);
+    border: 0;
+    box-shadow: 0 3px 12px rgba(22, 52, 79, .16);
+}
+
+.reportHeader .sapMTitle {
+    color: #fff;
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+.reportHeader .sapMBtnIcon {
+    color: #fff;
+}
+
+.filterPanel {
+    padding: .9rem 1rem .75rem;
+    margin-bottom: .85rem;
+    background: #fff;
+    border: 1px solid #dce5ee;
+    border-radius: .65rem;
+    box-shadow: 0 3px 14px rgba(29, 60, 90, .055);
+}
+
+.sectionEyebrow {
+    margin-bottom: .45rem;
+    color: #516a82;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.filterRow {
+    align-items: end;
+    gap: .65rem;
+}
+
+.filterField {
+    flex: 0 1 10.5rem;
+    max-width: 11.5rem;
+}
+
+.filterField.dateField {
+    flex-basis: 9.5rem;
+    max-width: 10rem;
+}
+
+.filterField .sapMLabel {
+    margin-bottom: .25rem;
+    color: #42596f;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.filterActions {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    padding-bottom: .05rem;
+}
+
+.filterHint {
+    margin-top: .55rem;
+    color: #64788c;
+    font-size: .75rem;
+    line-height: 1.45;
+}
+
+.filterField .sapMInputBaseContentWrapper {
+    border-radius: .35rem;
+}
+
+.filterField .sapMInputBaseContentWrapper:focus-within {
+    box-shadow: 0 0 0 .12rem rgba(20, 125, 184, .16);
+}
+
+.kpiRow {
+    gap: .65rem;
+    margin-bottom: .75rem;
+}
+
+.kpiCard {
+    box-sizing: border-box;
+    flex: 1 1 9rem;
+    min-width: 9rem;
+    padding: .75rem .9rem;
+    border-radius: .55rem;
+    color: #fff;
+    box-shadow: 0 3px 9px rgba(24, 55, 82, .12);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.kpiCard:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(24, 55, 82, .16);
+}
+
+.kpiLabel {
+    margin-bottom: .25rem;
+    color: rgba(255, 255, 255, .85);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.kpiCard .sapMObjectNumberText,
+.kpiCard .sapMObjectNumberUnit {
+    color: #fff;
+}
+
+.kpiBlue {
+    background: #287fc1;
+}
+
+.kpiCyan {
+    background: #3b9cce;
+}
+
+.kpiTeal {
+    background: #159b95;
+}
+
+.kpiGreen {
+    background: #55a978;
+}
+
+.kpiAmber {
+    background: #e9a533;
+}
+
+.kpiRed {
+    background: #d85b68;
+}
+
+.kpiSlate {
+    background: #8998a8;
+}
+
+.dataPanel.sapMPanel {
+    margin-bottom: .85rem;
+    border: 1px solid #dce5ee;
+    border-radius: .6rem;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 3px 14px rgba(29, 60, 90, .05);
+}
+
+.dataPanel .sapMPanelHdr,
+.dataPanel .sapMTB {
+    background: #fff;
+}
+
+.dataPanel .sapMPanelContent {
+    padding: 0;
+}
+
+.summaryPanel .sapMPanelContent {
+    padding: 0 .85rem .9rem;
+}
+
+.dataPanel .sapMPanelWrappingDivTb {
+    border-bottom: 1px solid #e3eaf1;
+}
+
+.dataPanel .sapMTitle {
+    color: #184f7d;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.dataPanel .sapMListTblHeaderCell {
+    background: #f3f7fb;
+    border-color: #dce5ee;
+}
+
+.dataPanel .sapMListTblHeaderCell .sapMText {
+    color: #345573;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.dataPanel .sapMListTblCell {
+    border-color: #e5ebf1;
+}
+
+.dataPanel .sapMListTblRow:hover {
+    background: #edf6fd;
+}
+
+.plantDashboard {
+    align-items: stretch;
+    flex-wrap: nowrap !important;
+    gap: .75rem;
+    height: 36rem;
+    min-height: 36rem;
+}
+
+.dashboardDetails {
+    flex: 0 0 calc(55% - .4rem);
+    width: calc(55% - .4rem);
+    min-width: 0;
+    height: 36rem;
+}
+
+.dashboardCharts {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    height: 36rem;
+    gap: .75rem;
+}
+
+.miniPanel.sapMPanel {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+    border: 1px solid #e1e8ef;
+    border-radius: .45rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+.dashboardDetails .miniPanel {
+    flex: 1 1 auto;
+    height: 36rem;
+}
+
+.dashboardDetails .miniPanel .sapMPanelContent {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.dashboardCharts .miniPanel {
+    flex: 0 0 17.6rem;
+    min-height: 17.6rem;
+    height: 17.6rem;
+}
+
+.miniPanel .sapMPanelContent {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: .35rem;
+    overflow: hidden;
+}
+
+.miniPanel .sapMTitle {
+    font-size: .83rem;
+}
+
+.chartPanel .sapMPanelContent {
+    display: flex;
+    height: 100%;
+    min-height: 0;
+}
+
+.plantDetailsTable {
+    width: 100%;
+}
+
+.plantDetailsPanel .sapMPanelContent {
+    box-sizing: border-box;
+    height: 32rem;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.plantDetailsTable .sapUiTableCnt {
+    border: 0;
+}
+
+.plantDetailsTable .sapUiTableColHdrCnt,
+.plantDetailsTable .sapUiTableCtrlScr {
+    background: #fff;
+}
+
+.plantDetailsTable .sapUiTableCol .sapMLabel {
+    color: #345573;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.plantDetailsTable .sapUiTableVSb,
+.plantDetailsTable .sapUiTableHSb {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.statusChartBody,
+.topPlantsChart {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: .55rem .75rem;
+}
+
+.statusChartBody {
+    gap: .7rem;
+}
+
+.statusDonutHost.sapUiHtm {
+    display: block;
+    flex: 0 0 9rem;
+    width: 9rem;
+    height: 9rem;
+}
+
+.statusDonut {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 50%;
+}
+
+.statusDonutCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 5.55rem;
+    height: 5.55rem;
+    border-radius: 50%;
+    background: #fff;
+    color: #174d76;
+    text-align: center;
+}
+
+.statusDonutCenter strong {
+    font-size: 1.15rem;
+    line-height: 1.35;
+}
+
+.statusDonutCenter span {
+    color: #526a80;
+    font-size: .68rem;
+}
+
+.statusLegend {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.statusLegendRow {
+    min-height: 1.75rem;
+    gap: .35rem;
+    white-space: nowrap;
+}
+
+.statusLegendRow .sapMObjStatusText,
+.statusLegendRow .sapMText {
+    font-size: .68rem;
+}
+
+.statusPercent {
+    min-width: 2.2rem;
+    color: #63788b;
+    text-align: end;
+}
+
+.topPlantsChart {
+    justify-content: center;
+    gap: .55rem;
+}
+
+.topPlantRow {
+    width: 100%;
+    gap: .45rem;
+}
+
+.topPlantLabel {
+    flex: 0 0 3.5rem;
+    color: #3c5871;
+    font-size: .72rem;
+}
+
+.topPlantBar {
+    flex: 1 1 auto;
+    min-width: 3rem;
+}
+
+.topPlantBar .sapMPI {
+    height: .8rem;
+    border: 0;
+    border-radius: .15rem;
+    background: #edf2f7;
+}
+
+.topPlantBar .sapMPIBar {
+    border-radius: .15rem;
+    background: #318bd0;
+}
+
+.topPlantValue {
+    flex: 0 0 2.7rem;
+    color: #2e4b63;
+    font-size: .72rem;
+    text-align: end;
+}
+
+.tableFooter.sapMTB {
+    min-height: 2.8rem;
+    border-top: 1px solid #e3eaf1;
+}
+
+.tableFooter .sapMText {
+    color: #526a80;
+    font-size: .75rem;
+}
+
+.messageStrip {
+    margin-bottom: .75rem;
+}
+
 @media (max-width: 600px) {
-	.reportRoot { padding: 0 .5rem 1rem; }
-	.reportHeader.sapMTB { margin: 0 -.5rem .65rem; padding: 0 .7rem; }
-	.reportHeader .sapMTitle { font-size: 1rem; }
-	.filterPanel { padding: .7rem; }
-	.filterField { flex-basis: 100%; max-width: none; }
-	.kpiCard { min-width: 8rem; }
+    .reportRoot {
+        padding: 0 .5rem 1rem;
+    }
+    .reportHeader.sapMTB {
+        margin: 0 -.5rem .65rem;
+        padding: 0 .7rem;
+    }
+    .reportHeader .sapMTitle {
+        font-size: 1rem;
+    }
+    .filterPanel {
+        padding: .7rem;
+    }
+    .filterField,
+    .filterField.dateField {
+        flex-basis: calc(50% - .4rem);
+        max-width: none;
+    }
+    .kpiCard {
+        min-width: 8rem;
+    }
+    .plantDashboard {
+        height: auto;
+        min-height: 0;
+        flex-wrap: wrap !important;
+    }
+    .dashboardDetails,
+    .dashboardCharts {
+        flex: 1 1 100%;
+        width: 100%;
+        min-width: 0;
+    }
+    .dashboardDetails {
+        height: 32rem;
+    }
+    .dashboardCharts {
+        height: auto;
+    }
+    .dashboardCharts .miniPanel {
+        flex: 0 0 17.6rem;
+        width: 100%;
+    }
+    .plantDetailsPanel.sapMPanel {
+        height: 36rem !important;
+    }
+    .plantDetailsPanel .sapMPanelContent {
+        height: 32rem;
+    }
 }
