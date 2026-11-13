@@ -1,0 +1,56 @@
+<mvc:View controllerName="Z_GRN_Report_GC.controller.View1" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" displayBlock="true">
+	<App>
+		<Page id="reportPage" showHeader="false" enableScrolling="true">
+			<content>
+				<VBox class="reportRoot">
+					<Toolbar class="reportHeader">
+						<Title text="GRN Analytical Report" level="H1" />
+					<ToolbarSpacer />
+					<Button icon="sap-icon://refresh" tooltip="Refresh report" press="onGo" type="Transparent" />
+						<Button icon="sap-icon://excel-attachment" tooltip="Download GRN data as CSV" press="onExport" type="Transparent" />
+					</Toolbar>
+					<VBox class="filterPanel">
+						<Label text="Report filters" class="sectionEyebrow" />
+						<HBox wrap="Wrap" class="filterRow">
+							<VBox class="filterField"><Label text="Plant"/><Input id="plantInput" value="G120" placeholder="Enter plant (WERKS)" /></VBox>
+							<VBox class="filterField"><Label text="PO Number"/><Input id="poInput" value="2601000180" placeholder="Enter purchase order (EBELN)" /></VBox>
+							<VBox class="filterActions"><Button text="Go" type="Emphasized" icon="sap-icon://search" press="onGo"/><Button text="Reset" press="onReset"/></VBox>
+						</HBox>
+						<Text text="Choose a plant row to see its purchase orders, then choose a PO to inspect its GRN documents." class="filterHint" />
+					</VBox>
+					<HBox wrap="Wrap" class="kpiRow">
+						<VBox class="kpiCard kpiBlue"><Text text="PLANTS" class="kpiLabel"/><ObjectNumber number="{summary>/plantCount}" /></VBox>
+						<VBox class="kpiCard kpiCyan"><Text text="PURCHASE ORDERS" class="kpiLabel"/><ObjectNumber number="{summary>/poCount}" /></VBox>
+						<VBox class="kpiCard kpiTeal"><Text text="MATERIAL DOCUMENTS" class="kpiLabel"/><ObjectNumber number="{summary>/documentCount}" /></VBox>
+						<VBox class="kpiCard kpiGreen"><Text text="COMPLETED" class="kpiLabel"/><ObjectNumber number="{summary>/completed}" state="Success" /></VBox>
+						<VBox class="kpiCard kpiAmber"><Text text="PENDING" class="kpiLabel"/><ObjectNumber number="{summary>/pending}" state="Warning" /></VBox>
+						<VBox class="kpiCard kpiRed"><Text text="REJECTED" class="kpiLabel"/><ObjectNumber number="{summary>/rejected}" state="Error" /></VBox>
+					</HBox>
+					<MessageStrip id="messageStrip" visible="false" showIcon="true" type="Error" class="messageStrip" />
+					<Panel class="dataPanel" expandable="false">
+						<headerToolbar><Toolbar><core:Icon src="sap-icon://factory"/><Title text="Plant-wise Summary" level="H2"/><ToolbarSpacer/><ObjectStatus text="{summary>/plantRows} rows" state="Information"/></Toolbar></headerToolbar>
+						<Table id="plantTable" items="{plantData>/rows}" growing="true" growingThreshold="50" noDataText="No plant records found">
+							<columns><Column><Text text="Plant"/></Column><Column><Text text="Plant Name"/></Column><Column hAlign="End"><Text text="Total POs"/></Column><Column hAlign="End"><Text text="Total Documents"/></Column><Column hAlign="End"><Text text="Completed"/></Column><Column hAlign="End"><Text text="Pending"/></Column><Column hAlign="End"><Text text="Rejected"/></Column><Column hAlign="End"><Text text="Cancelled"/></Column><Column><Text text="Vendor"/></Column><Column><Text text="Posting Date"/></Column></columns>
+							<items><ColumnListItem type="Navigation" press="onPlantSelect"><cells><ObjectIdentifier title="{plantData>werks}"/><Text text="{plantData>plant_name}"/><ObjectNumber number="{plantData>ebeln}"/><ObjectNumber number="{plantData>belnr}"/><ObjectNumber number="{plantData>completed}" state="Success"/><ObjectNumber number="{plantData>pending}" state="Warning"/><ObjectNumber number="{plantData>rejected}" state="Error"/><Text text="{plantData>cancelled}"/><Text text="{plantData>lifnr}"/><Text text="{plantData>budat}"/></cells></ColumnListItem></items>
+						</Table>
+					</Panel>
+					<Panel id="poPanel" class="dataPanel" expandable="false">
+						<headerToolbar><Toolbar><core:Icon src="sap-icon://shipping-status"/><Title id="poTitle" text="PO-wise Summary" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPlant" text="Plant: G120" state="Information"/></Toolbar></headerToolbar>
+						<Table id="poTable" items="{poData>/rows}" growing="true" growingThreshold="50" noDataText="No purchase orders found">
+							<columns><Column><Text text="PO Number"/></Column><Column><Text text="Vendor"/></Column><Column><Text text="Vendor Name"/></Column><Column><Text text="PO Date"/></Column><Column hAlign="End"><Text text="GRN Docs"/></Column><Column hAlign="End"><Text text="103"/></Column><Column hAlign="End"><Text text="105"/></Column><Column hAlign="End"><Text text="Completed"/></Column><Column hAlign="End"><Text text="Pending"/></Column><Column hAlign="End"><Text text="Rejected"/></Column><Column hAlign="End"><Text text="Cancelled"/></Column><Column><Text text="Storage Location"/></Column></columns>
+							<items><ColumnListItem type="Navigation" press="onPoSelect"><cells><ObjectIdentifier title="{poData>ebeln}"/><Text text="{poData>lifnr}"/><Text text="{poData>lifnr_name}"/><Text text="{poData>bedat}"/><ObjectNumber number="{poData>mblnr}"/><Text text="{poData>mblnr_103}"/><Text text="{poData>mblnr_105}"/><ObjectNumber number="{poData>completed}" state="Success"/><ObjectNumber number="{poData>pending}" state="Warning"/><ObjectNumber number="{poData>rejected}" state="Error"/><Text text="{poData>cancelled}"/><Text text="{poData>lgort}"/></cells></ColumnListItem></items>
+						</Table>
+					</Panel>
+					<Panel id="grnPanel" class="dataPanel" expandable="false">
+						<headerToolbar><Toolbar><core:Icon src="sap-icon://document-text"/><Title id="grnTitle" text="GRN / Material Document Details" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPo" text="PO: 2601000180" state="Information"/></Toolbar></headerToolbar>
+						<Table id="grnTable" items="{grnData>/rows}" growing="true" growingThreshold="50" noDataText="No GRN records found for this PO">
+							<columns><Column><Text text="Material Document"/></Column><Column><Text text="Movement"/></Column><Column><Text text="Reference Doc."/></Column><Column><Text text="Invoice"/></Column><Column><Text text="Material"/></Column><Column minScreenWidth="Tablet" demandPopin="true"><Text text="Description"/></Column><Column><Text text="UoM"/></Column><Column hAlign="End"><Text text="PO Qty"/></Column><Column hAlign="End"><Text text="GRN Qty"/></Column><Column hAlign="End"><Text text="Invoice Qty"/></Column><Column hAlign="End"><Text text="Rejection Qty"/></Column><Column><Text text="Status"/></Column><Column><Text text="GRN Date"/></Column><Column><Text text="Post Date"/></Column><Column><Text text="Time"/></Column><Column><Text text="Storage"/></Column><Column><Text text="GRN User"/></Column><Column minScreenWidth="Tablet" demandPopin="true"><Text text="Remarks"/></Column><Column hAlign="End"><Text text="Ageing (Days)"/></Column></columns>
+							<items><ColumnListItem><cells><Text text="{grnData>mblnr}"/><Text text="{grnData>bwart}"/><Text text="{grnData>lfbnr}"/><Text text="{grnData>xblnr}"/><Text text="{grnData>matnr}"/><Text text="{grnData>maktx}"/><Text text="{grnData>meins}"/><Text text="{grnData>menge}"/><Text text="{grnData>acqty}"/><Text text="{grnData>menge_i}"/><Text text="{grnData>rjqty}"/><ObjectStatus text="{grnData>status}"/><Text text="{grnData>budat}"/><Text text="{grnData>budat_mkpf}"/><Text text="{grnData>cputm}"/><Text text="{grnData>lgort}"/><Text text="{grnData>usnam}"/><Text text="{grnData>bktxt}"/><Text text="{grnData>vend_age}"/></cells></ColumnListItem></items>
+						</Table>
+						<Toolbar class="tableFooter"><Text id="grnFooter" text="Select a PO to view its GRN documents."/><ToolbarSpacer/><Button text="Download CSV" icon="sap-icon://excel-attachment" press="onExport"/></Toolbar>
+					</Panel>
+				</VBox>
+			</content>
+		</Page>
+	</App>
+</mvc:View>

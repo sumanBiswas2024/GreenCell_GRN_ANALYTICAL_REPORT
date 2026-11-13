@@ -1,0 +1,93 @@
+{
+	"_version": "1.7.0",
+	"sap.app": {
+		"id": "Z_GRN_Report_GC",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"sourceTemplate": {
+			"id": "servicecatalog.connectivityComponent",
+			"version": "0.0.0"
+		},
+		"dataSources": {
+			"ZO_GR_REPORT_SRV": {
+				"uri": "/sap/opu/odata/sap/ZO_GR_REPORT_SRV/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "2.0",
+					"localUri": "localService/metadata.xml"
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_fiori_3",
+			"sap_hcb"
+		]
+	},
+	"sap.ui5": {
+		"rootView": {
+			"viewName": "Z_GRN_Report_GC.view.View1",
+			"type": "XML"
+		},
+		"dependencies": {
+			"minUI5Version": "1.108.56",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"": {
+				"dataSource": "ZO_GR_REPORT_SRV",
+				"settings": {
+					"defaultBindingMode": "OneWay",
+					"useBatch": true,
+					"defaultCountMode": "None",
+					"refreshAfterChange": false
+				}
+			},
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "Z_GRN_Report_GC.i18n.i18n"
+				}
+			}
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
+		}
+	},
+	"sap.platform.abap": {
+		"uri": "/sap/bc/ui5_ui5/sap/zbsp_grn_a/webapp",
+		"_version": "1.1.0"
+	}
+}

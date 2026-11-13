@@ -1,0 +1,38 @@
+html, body, #content { height: 100%; }
+.reportRoot { min-width: 0; padding: 0 1rem 1.25rem; background: #f2f6fa; }
+.reportHeader.sapMTB { min-height: 3.5rem; margin: 0 -1rem 1rem; padding: 0 1.25rem; color: #fff; background: linear-gradient(105deg, #123d68, #205b8c); border: 0; box-shadow: 0 2px 7px rgba(22, 52, 79, .2); }
+.reportHeader .sapMTitle { color: #fff; font-size: 1.2rem; font-weight: 700; }
+.reportHeader .sapMBtnIcon { color: #fff; }
+.filterPanel { padding: .8rem 1rem .65rem; margin-bottom: .75rem; background: #fff; border: 1px solid #d8e2ec; border-radius: .45rem; box-shadow: 0 1px 2px rgba(29, 60, 90, .04); }
+.sectionEyebrow { margin-bottom: .45rem; color: #516a82; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.filterRow { align-items: end; gap: .75rem; }
+.filterField { flex: 1 1 13rem; max-width: 21rem; }
+.filterField .sapMLabel { margin-bottom: .25rem; color: #42596f; font-size: .75rem; font-weight: 600; }
+.filterActions { display: flex; flex-direction: row; gap: .5rem; padding-bottom: .05rem; }
+.filterHint { margin-top: .55rem; color: #64788c; font-size: .75rem; }
+.kpiRow { gap: .65rem; margin-bottom: .75rem; }
+.kpiCard { box-sizing: border-box; flex: 1 1 9rem; min-width: 9rem; padding: .7rem .85rem; border-radius: .4rem; color: #fff; box-shadow: 0 2px 5px rgba(24, 55, 82, .12); }
+.kpiLabel { margin-bottom: .25rem; color: rgba(255,255,255,.85); font-size: .68rem; font-weight: 700; letter-spacing: .04em; }
+.kpiCard .sapMObjectNumberText, .kpiCard .sapMObjectNumberUnit { color: #fff; }
+.kpiBlue { background: #287fc1; }.kpiCyan { background: #3b9cce; }.kpiTeal { background: #159b95; }
+.kpiGreen { background: #55a978; }.kpiAmber { background: #e9a533; }.kpiRed { background: #d85b68; }
+.dataPanel.sapMPanel { margin-bottom: .75rem; border: 1px solid #d8e2ec; border-radius: .45rem; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(29, 60, 90, .04); }
+.dataPanel .sapMPanelHdr, .dataPanel .sapMTB { background: #fff; }
+.dataPanel .sapMPanelContent { padding: 0; }
+.dataPanel .sapMPanelWrappingDivTb { border-bottom: 1px solid #e3eaf1; }
+.dataPanel .sapMTitle { color: #184f7d; font-weight: 700; }
+.dataPanel .sapMListTblHeaderCell { background: #f3f7fb; border-color: #dce5ee; }
+.dataPanel .sapMListTblHeaderCell .sapMText { color: #345573; font-size: .75rem; font-weight: 700; }
+.dataPanel .sapMListTblCell { border-color: #e5ebf1; }
+.dataPanel .sapMListTblRow:hover { background: #edf6fd; }
+.tableFooter.sapMTB { min-height: 2.8rem; border-top: 1px solid #e3eaf1; }
+.tableFooter .sapMText { color: #526a80; font-size: .75rem; }
+.messageStrip { margin-bottom: .75rem; }
+@media (max-width: 600px) {
+	.reportRoot { padding: 0 .5rem 1rem; }
+	.reportHeader.sapMTB { margin: 0 -.5rem .65rem; padding: 0 .7rem; }
+	.reportHeader .sapMTitle { font-size: 1rem; }
+	.filterPanel { padding: .7rem; }
+	.filterField { flex-basis: 100%; max-width: none; }
+	.kpiCard { min-width: 8rem; }
+}

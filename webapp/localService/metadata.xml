@@ -1,0 +1,83 @@
+<edmx:Edmx
+    xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
+    xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+    xmlns:sap="http://www.sap.com/Protocols/SAPData" Version="1.0">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema
+            xmlns="http://schemas.microsoft.com/ado/2008/09/edm" Namespace="ZO_GR_REPORT_SRV" xml:lang="en" sap:schema-version="1">
+            <EntityType Name="es_plant_wise" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="werks"/>
+                </Key>
+                <Property Name="werks" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Plant"/>
+                <Property Name="plant_name" Type="Edm.String" sap:unicode="false" sap:label="Plant Name"/>
+                <Property Name="ebeln" Type="Edm.String" sap:unicode="false" sap:label="Total PO"/>
+                <Property Name="belnr" Type="Edm.String" sap:unicode="false" sap:label="Total Documents"/>
+                <Property Name="completed" Type="Edm.String" sap:unicode="false" sap:label="Completed"/>
+                <Property Name="pending" Type="Edm.String" sap:unicode="false" sap:label="Pending"/>
+                <Property Name="rejected" Type="Edm.String" sap:unicode="false" sap:label="Rejected"/>
+                <Property Name="cancelled" Type="Edm.String" sap:unicode="false" sap:label="Cancelled"/>
+                <Property Name="budat" Type="Edm.String" sap:unicode="false" sap:label="Posting Date"/>
+                <Property Name="lifnr" Type="Edm.String" sap:unicode="false" sap:label="Vendor"/>
+                <Property Name="lgort" Type="Edm.String" sap:unicode="false" sap:label="Storage Location"/>
+                <Property Name="bwart" Type="Edm.String" sap:unicode="false" sap:label="Movement type"/>
+            </EntityType>
+            <EntityType Name="es_powise" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ebeln"/>
+                    <PropertyRef Name="lifnr"/>
+                </Key>
+                <Property Name="ebeln" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Purchase Order" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="lifnr" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Vendor" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="lifnr_name" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Vendor name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="bedat" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="PO Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="mblnr" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Total Documents" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="mblnr_103" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="103" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="mblnr_105" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="105" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="completed" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Completed" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="pending" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Pending" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="rejected" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Rejected" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="cancelled" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Cancelled" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="lgort" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Storage Location" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="werks" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Plant" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="es_grn" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="mblnr"/>
+                </Key>
+                <Property Name="mblnr" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Material Document"/>
+                <Property Name="ebeln" Type="Edm.String" sap:unicode="false" sap:label="PO"/>
+                <Property Name="werks" Type="Edm.String" sap:unicode="false" sap:label="Plant"/>
+                <Property Name="bwart" Type="Edm.String" sap:unicode="false" sap:label="Movement type"/>
+                <Property Name="lfbnr" Type="Edm.String" sap:unicode="false" sap:label="Reference Doc."/>
+                <Property Name="xblnr" Type="Edm.String" sap:unicode="false" sap:label="Invoice"/>
+                <Property Name="matnr" Type="Edm.String" sap:unicode="false" sap:label="Material"/>
+                <Property Name="maktx" Type="Edm.String" sap:unicode="false" sap:label="Material description"/>
+                <Property Name="meins" Type="Edm.String" sap:unicode="false" sap:label="Uom"/>
+                <Property Name="menge" Type="Edm.String" sap:unicode="false" sap:label="PO Qty"/>
+                <Property Name="acqty" Type="Edm.String" sap:unicode="false" sap:label="GRN Qty"/>
+                <Property Name="menge_i" Type="Edm.String" sap:unicode="false" sap:label="Invoice Quantity"/>
+                <Property Name="rjqty" Type="Edm.String" sap:unicode="false" sap:label="Rejection Qty"/>
+                <Property Name="status" Type="Edm.String" sap:unicode="false" sap:label="Status"/>
+                <Property Name="budat" Type="Edm.String" sap:unicode="false" sap:label="Grn Date"/>
+                <Property Name="budat_mkpf" Type="Edm.String" sap:unicode="false" sap:label="Posting date"/>
+                <Property Name="cputm" Type="Edm.String" sap:unicode="false" sap:label="Posting time"/>
+                <Property Name="lgort" Type="Edm.String" sap:unicode="false" sap:label="Storage Location"/>
+                <Property Name="usnam" Type="Edm.String" sap:unicode="false" sap:label="GRN user name"/>
+                <Property Name="bktxt" Type="Edm.String" sap:unicode="false" sap:label="Remarks"/>
+                <Property Name="vend_age" Type="Edm.String" sap:unicode="false" sap:label="Vendor Ageing (Days)"/>
+            </EntityType>
+            <EntityContainer Name="ZO_GR_REPORT_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="es_plant_wiseset" EntityType="ZO_GR_REPORT_SRV.es_plant_wise" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="es_powiseset" EntityType="ZO_GR_REPORT_SRV.es_powise" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="es_grnset" EntityType="ZO_GR_REPORT_SRV.es_grn" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <Annotation
+                xmlns="http://docs.oasis-open.org/odata/ns/edm" Term="Core.SchemaVersion" String="1.0.0"/>
+                <atom:link
+                    xmlns:atom="http://www.w3.org/2005/Atom" rel="self" href="./sap/ZO_GR_REPORT_SRV/$metadata"/>
+                    <atom:link
+                        xmlns:atom="http://www.w3.org/2005/Atom" rel="latest-version" href="./sap/ZO_GR_REPORT_SRV/$metadata"/>
+                    </Schema>
+                </edmx:DataServices>
+            </edmx:Edmx>
