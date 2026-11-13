@@ -8,7 +8,7 @@
 						<Title text="GRN Analytical Report" level="H1"/>
 						<ToolbarSpacer/>
 						<Button icon="sap-icon://refresh" tooltip="Refresh plant data from service" press="onRefresh" type="Transparent"/>
-						<Button icon="sap-icon://excel-attachment" tooltip="Download GRN data as CSV" press="onExport" type="Transparent"/>
+						<!--<Button icon="sap-icon://excel-attachment" tooltip="Download GRN data as CSV" press="onExport" type="Transparent"/>-->
 					</Toolbar>
 					<VBox class="filterPanel">
 						<Label text="Report filters" class="sectionEyebrow"/>

@@ -56,13 +56,15 @@ body,
 }
 
 .filterField {
-    flex: 0 1 10.5rem;
-    max-width: 11.5rem;
+    flex: 1 1 0;
+    min-width: 10rem;
+    max-width: none;
 }
 
 .filterField.dateField {
-    flex-basis: 9.5rem;
-    max-width: 10rem;
+    flex: 1 1 0;
+    min-width: 10rem;
+    max-width: none;
 }
 
 .filterField .sapMLabel {
