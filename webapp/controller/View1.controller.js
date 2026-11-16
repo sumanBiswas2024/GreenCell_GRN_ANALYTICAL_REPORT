@@ -34,7 +34,9 @@ sap.ui.define([
 				poCount: "0", documentCount: "0", completed: "0", pending: "0", rejected: "0", cancelled: "0"
 			}), "poSummary");
 			this._activePlant = "";
+			this._activePlantName = "";
 			this._activePo = "";
+			this._grnSourceRows = [];
 			this._grnDateFrom = null;
 			this._grnDateTo = null;
 			this._requestIds = {};
@@ -57,6 +59,7 @@ sap.ui.define([
 			var sPo = this.byId("poInput").getValue().trim();
 			var oDateRange = this._readDateRange();
 			this._activePlant = sPlant;
+			this._activePlantName = "";
 			this._activePo = "";
 			this._notices = {};
 			this._renderNotices();
@@ -71,7 +74,9 @@ sap.ui.define([
 			this._resetSummary();
 
 			this.byId("selectedPlant").setText(sPlant ? "Plant: " + sPlant : "All plants");
+			this.byId("selectedGrnPlant").setText(sPlant ? this._plantToolbarText(sPlant, this._activePlantName) : "Select a plant");
 			this.byId("selectedPo").setText("Select a PO");
+			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			if (sPlant) {
 				this._read("plantData", "plantTable", "/es_plant_wiseset", [this._eq("werks", sPlant)],
 					"No plants found for the selected filter.", this._onPlantData.bind(this));
@@ -115,6 +120,7 @@ sap.ui.define([
 			this.byId("grnDateFrom").setValue("");
 			this.byId("grnDateTo").setValue("");
 			this._activePlant = "";
+			this._activePlantName = "";
 			this._activePo = "";
 			this._grnDateFrom = null;
 			this._grnDateTo = null;
@@ -123,7 +129,9 @@ sap.ui.define([
 			this._resetSummary();
 			this._resetPoSummary();
 			this.byId("selectedPlant").setText("All plants");
+			this.byId("selectedGrnPlant").setText("Select a plant");
 			this.byId("selectedPo").setText("Select a PO");
+			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			this.byId("poInput").setPlaceholder("Select a plant first");
 			this._setDetailPanelState("", "");
 			this._clearTable("plantData", "plantTable", "Loading all plants…");
@@ -166,6 +174,7 @@ sap.ui.define([
 			this._notices = {};
 			this._renderNotices();
 			this._activePlant = oRow.werks;
+			this._activePlantName = oRow.plant_name || "";
 			this._updateCharts([oRow]);
 			this._setPoSummary(oRow);
 			this._activePo = "";
@@ -174,6 +183,7 @@ sap.ui.define([
 			this.byId("poInput").setValue("");
 			this.byId("poInput").setPlaceholder("Enter or select a PO");
 			this.byId("selectedPlant").setText("Plant: " + oRow.werks);
+			this.byId("selectedGrnPlant").setText(this._plantToolbarText(oRow.werks, oRow.plant_name));
 			this.byId("selectedPo").setText("Select a PO");
 			this._loadPos(oRow.werks);
 			this._clearTable("grnData", "grnTable", "Choose a PO to load GRN documents.");
@@ -230,6 +240,8 @@ sap.ui.define([
 				this._setNotice("validation", "Choose both a plant and a PO to load GRN details.", "Warning");
 				return;
 			}
+			this._grnSourceRows = [];
+			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			var sFrom = this._formatODataDate(this._grnDateFrom);
 			var sTo = this._formatODataDate(this._grnDateTo);
 			var sCacheKey = [sPlant, sPo, sFrom, sTo].join("\u001f");
@@ -250,12 +262,29 @@ sap.ui.define([
 		},
 
 		_showGrnRows: function(aRows, sPlant, sPo) {
-			this._setRows("grnData", aRows);
-			this._setTableNoData(this.byId("grnTable"), "No GRN documents match the selected date range.");
-			this.byId("grnFooter").setText("Showing " + aRows.length + " material document" + (aRows.length === 1 ? "" : "s") +
-				" for PO " + sPo + " at plant " + sPlant + ".");
-			this._setNotice("grn-empty", aRows.length ? "" : "No GRN documents match the selected plant, PO, and date range.", "Information");
+			this._grnSourceRows = aRows;
+			this.byId("selectedGrnPlant").setText(this._plantToolbarText(sPlant, this._activePlantName));
+			this.byId("selectedPo").setText("PO: " + sPo);
+			this._applyGrnStatusFilter();
 			this._setNotice("date-format", "", "Warning");
+		},
+
+		onGrnStatusChange: function() {
+			this._applyGrnStatusFilter();
+		},
+
+		_applyGrnStatusFilter: function() {
+			var aRows = this._grnSourceRows || [];
+			var sStatus = this.byId("grnStatusFilter").getSelectedKey();
+			var aVisibleRows = sStatus === "ALL" ? aRows : aRows.filter(function(oRow) {
+				return String(oRow.status || "").trim().toUpperCase() === sStatus;
+			});
+			this._setRows("grnData", aVisibleRows);
+			this._setTableNoData(this.byId("grnTable"), sStatus === "ALL" ?
+				"No GRN documents match the selected plant, PO, and date range." : "No " + sStatus.toLowerCase() + " GRN documents match the selected plant, PO, and date range.");
+			var sStatusLabel = sStatus === "ALL" ? "all statuses" : sStatus.toLowerCase();
+			this.byId("grnFooter").setText("Showing " + aVisibleRows.length + " of " + aRows.length + " material documents (" + sStatusLabel + ").");
+			this._setNotice("grn-empty", aVisibleRows.length ? "" : "No GRN documents match the selected plant, PO, date range, and status.", "Information");
 		},
 
 		_formatODataDate: function(oDate) {
@@ -263,6 +292,36 @@ sap.ui.define([
 			var sMonth = String(oDate.getMonth() + 1).padStart(2, "0");
 			var sDay = String(oDate.getDate()).padStart(2, "0");
 			return String(oDate.getFullYear()) + sMonth + sDay;
+		},
+
+		formatDate: function(vDate) {
+			if (vDate == null || vDate === "") { return ""; }
+			if (vDate instanceof Date && !isNaN(vDate.getTime())) {
+				return this._padDatePart(vDate.getDate()) + "/" + this._padDatePart(vDate.getMonth() + 1) + "/" + vDate.getFullYear();
+			}
+			var sDate = String(vDate).trim();
+			var aMatch = /^(\d{4})(\d{2})(\d{2})$/.exec(sDate);
+			if (aMatch) { return aMatch[3] + "/" + aMatch[2] + "/" + aMatch[1]; }
+			aMatch = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|T)/.exec(sDate);
+			if (aMatch) { return this._padDatePart(aMatch[3]) + "/" + this._padDatePart(aMatch[2]) + "/" + aMatch[1]; }
+			aMatch = /^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/.exec(sDate);
+			if (aMatch) { return this._padDatePart(aMatch[1]) + "/" + this._padDatePart(aMatch[2]) + "/" + aMatch[3]; }
+			aMatch = /^\/Date\((\d+)\)\/$/.exec(sDate);
+			if (aMatch) {
+				var oParsedDate = new Date(parseInt(aMatch[1], 10));
+				if (!isNaN(oParsedDate.getTime())) {
+					return this._padDatePart(oParsedDate.getDate()) + "/" + this._padDatePart(oParsedDate.getMonth() + 1) + "/" + oParsedDate.getFullYear();
+				}
+			}
+			return sDate;
+		},
+
+		_padDatePart: function(vPart) {
+			return String(vPart).padStart(2, "0");
+		},
+
+		_plantToolbarText: function(sPlant, sPlantName) {
+			return "Plant: " + sPlant + (sPlantName ? " · " + sPlantName : "");
 		},
 
 		_readDateRange: function() {
@@ -396,6 +455,8 @@ sap.ui.define([
 			this._setNotice("plant-empty", aRows.length ? "" : "No plant data is available for this request.", "Information");
 			if (this._activePlant) {
 				var oSelectedPlant = aRows.find(function(oRow) { return String(oRow.werks || "") === this._activePlant; }.bind(this));
+				this._activePlantName = oSelectedPlant && oSelectedPlant.plant_name || "";
+				this.byId("selectedGrnPlant").setText(this._plantToolbarText(this._activePlant, this._activePlantName));
 				this._setPoSummary(oSelectedPlant);
 			}
 			this._updateCharts(aRows);
@@ -588,6 +649,10 @@ sap.ui.define([
 			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
 			delete this._requestActive[sModelName];
 			this._endMainBusy("read:" + sModelName);
+			if (sModelName === "grnData") {
+				this._grnSourceRows = [];
+				this.byId("grnStatusFilter").setSelectedKey("ALL");
+			}
 			this.byId(sTableId).setBusy(false);
 			this._setTableNoData(this.byId(sTableId), sText);
 			this._setRows(sModelName, []);
@@ -708,12 +773,35 @@ sap.ui.define([
 				MessageToast.show("There are no GRN rows to export.");
 				return;
 			}
-			var aColumns = ["mblnr", "bwart", "lfbnr", "xblnr", "matnr", "maktx", "meins", "menge", "acqty", "menge_i", "rjqty", "status",
-				"budat", "budat_mkpf", "cputm", "lgort", "usnam", "bktxt", "vend_age"
+			var aColumns = [
+				{key: "mblnr", label: "Material Document"},
+				{key: "bwart", label: "Movement"},
+				{key: "lfbnr", label: "Reference Doc."},
+				{key: "xblnr", label: "Invoice"},
+				{key: "matnr", label: "Material"},
+				{key: "maktx", label: "Description"},
+				{key: "meins", label: "UoM"},
+				{key: "menge", label: "PO Qty"},
+				{key: "acqty", label: "GRN Qty"},
+				{key: "menge_i", label: "Invoice Qty"},
+				{key: "rjqty", label: "Rejection Qty"},
+				{key: "status", label: "Status"},
+				{key: "budat", label: "GRN Date"},
+				{key: "budat_mkpf", label: "Post Date"},
+				{key: "cputm", label: "Time"},
+				{key: "lgort", label: "Storage"},
+				{key: "usnam", label: "GRN User"},
+				{key: "bktxt", label: "Remarks"},
+				{key: "vend_age", label: "Ageing (Days)"}
 			];
-			var sCsv = [aColumns.join(",")].concat(aRows.map(function(oRow) {
-				return aColumns.map(function(sKey) {
-					return '"' + String(oRow[sKey] == null ? "" : oRow[sKey]).replace(/"/g, '""') + '"';
+			var fnCsvCell = function(vValue) {
+				return '"' + String(vValue == null ? "" : vValue).replace(/"/g, '""') + '"';
+			};
+			var sCsv = [aColumns.map(function(oColumn) {
+				return fnCsvCell(oColumn.label);
+			}).join(",")].concat(aRows.map(function(oRow) {
+				return aColumns.map(function(oColumn) {
+					return fnCsvCell(oRow[oColumn.key]);
 				}).join(",");
 			})).join("\r\n");
 			var oBlob = new Blob(["\ufeff" + sCsv], {

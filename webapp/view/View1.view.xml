@@ -162,7 +162,7 @@
 								</table:Column>
 								<table:Column width="9rem">
 									<table:label><Label text="PO Date"/></table:label>
-									<table:template><Text text="{poData>bedat}"/></table:template>
+										<table:template><Text text="{path: 'poData>bedat', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="8rem" hAlign="End">
 									<table:label><Label text="GRN Docs"/></table:label>
@@ -201,7 +201,23 @@
 					</Panel>
 					<Panel id="grnPanel" class="dataPanel" expandable="true" expanded="false">
 						<headerToolbar>
-							<Toolbar><core:Icon src="sap-icon://document-text"/><Title id="grnTitle" text="GRN / Material Document Details" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPo" text="Select a PO" state="Information"/></Toolbar>
+							<Toolbar>
+								<core:Icon src="sap-icon://document-text"/>
+								<Title id="grnTitle" text="GRN / Material Document Details" level="H2"/>
+								<ToolbarSpacer/>
+								<Select id="grnStatusFilter" class="grnStatusFilter" width="9rem" selectedKey="ALL" change="onGrnStatusChange" tooltip="Filter GRN documents by status">
+									<items>
+										<core:Item key="ALL" text="All statuses"/>
+										<core:Item key="COMPLETED" text="Completed"/>
+										<core:Item key="PENDING" text="Pending"/>
+										<core:Item key="REJECTED" text="Rejected"/>
+										<core:Item key="CANCELLED" text="Cancelled"/>
+									</items>
+								</Select>
+								<ToolbarSpacer/>
+								<ObjectStatus id="selectedGrnPlant" text="Select a plant" state="Information"/>
+								<ObjectStatus id="selectedPo" text="Select a PO" state="Information"/>
+							</Toolbar>
 						</headerToolbar>
 						<table:Table id="grnTable" class="fixedDataTable" rows="{grnData>/rows}" width="100%" height="25rem" visibleRowCount="10"
 							visibleRowCountMode="Fixed" selectionMode="None" enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
@@ -257,11 +273,11 @@
 								</table:Column>
 								<table:Column width="10rem">
 									<table:label><Label text="GRN Date"/></table:label>
-									<table:template><Text text="{grnData>budat}"/></table:template>
+										<table:template><Text text="{path: 'grnData>budat', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="10rem">
 									<table:label><Label text="Post Date"/></table:label>
-									<table:template><Text text="{grnData>budat_mkpf}"/></table:template>
+										<table:template><Text text="{path: 'grnData>budat_mkpf', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="8rem">
 									<table:label><Label text="Time"/></table:label>

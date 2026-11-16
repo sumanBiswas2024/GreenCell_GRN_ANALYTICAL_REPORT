@@ -481,6 +481,10 @@ body,
     border-top: 1px solid #e3eaf1;
 }
 
+.grnStatusFilter {
+    margin-inline: .4rem;
+}
+
 .tableFooter .sapMText {
     color: #526a80;
     font-size: .75rem;
