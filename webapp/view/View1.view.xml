@@ -128,7 +128,7 @@
 							</HBox>
 						</content>
 					</Panel>
-					<Panel id="poPanel" class="dataPanel" expandable="false">
+					<Panel id="poPanel" class="dataPanel" expandable="true" expanded="false">
 						<headerToolbar>
 							<Toolbar><core:Icon src="sap-icon://shipping-status"/><Title id="poTitle" text="PO-wise Summary" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPlant" text="All plants" state="Information"/></Toolbar>
 						</headerToolbar>
@@ -188,7 +188,7 @@
 							</table:columns>
 						</table:Table>
 					</Panel>
-					<Panel id="grnPanel" class="dataPanel" expandable="false">
+					<Panel id="grnPanel" class="dataPanel" expandable="true" expanded="false">
 						<headerToolbar>
 							<Toolbar><core:Icon src="sap-icon://document-text"/><Title id="grnTitle" text="GRN / Material Document Details" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPo" text="Select a PO" state="Information"/></Toolbar>
 						</headerToolbar>

@@ -36,6 +36,8 @@ sap.ui.define([
 			this._grnDateTo = null;
 			this._requestIds = {};
 			this._requestActive = {};
+			this._poCache = Object.create(null);
+			this._grnCache = Object.create(null);
 			this._mainBusyRequests = {};
 			this._mainBusyCount = 0;
 			this.byId("reportPage").setBusyIndicatorDelay(0);
@@ -61,6 +63,7 @@ sap.ui.define([
 			}
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
+			this._setDetailPanelState(sPlant, sPo);
 			this._resetSummary();
 
 			this.byId("selectedPlant").setText(sPlant ? "Plant: " + sPlant : "All plants");
@@ -117,12 +120,15 @@ sap.ui.define([
 			this.byId("selectedPlant").setText("All plants");
 			this.byId("selectedPo").setText("Select a PO");
 			this.byId("poInput").setPlaceholder("Select a plant first");
+			this._setDetailPanelState("", "");
 			this._clearTable("plantData", "plantTable", "Loading all plants…");
 			this._clearTable("poData", "poTable", "Choose a plant to load its purchase orders.");
 			this._clearTable("grnData", "grnTable", "Choose a plant and PO to load GRN documents.");
 			this.byId("grnFooter").setText("Select a plant and PO to view GRN documents.");
 			this._allPlantsLoaded = false;
 			this._allPlantRows = [];
+			this._poCache = Object.create(null);
+			this._grnCache = Object.create(null);
 			this._loadAllPlants(true);
 		},
 
@@ -157,6 +163,7 @@ sap.ui.define([
 			this._activePlant = oRow.werks;
 			this._updateCharts([oRow]);
 			this._activePo = "";
+			this._setDetailPanelState(oRow.werks, "");
 			this.byId("plantInput").setValue(oRow.werks);
 			this.byId("poInput").setValue("");
 			this.byId("poInput").setPlaceholder("Enter or select a PO");
@@ -189,6 +196,8 @@ sap.ui.define([
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
 			this._activePo = oRow.ebeln;
+			this.byId("poPanel").setExpanded(true);
+			this.byId("grnPanel").setExpanded(true);
 			this.byId("poInput").setValue(oRow.ebeln);
 			this.byId("selectedPo").setText("PO: " + oRow.ebeln);
 			this._loadGrns(this._activePlant, oRow.ebeln);
@@ -196,9 +205,18 @@ sap.ui.define([
 		},
 
 		_loadPos: function(sPlant) {
+			if (Object.prototype.hasOwnProperty.call(this._poCache, sPlant)) {
+				this._cancelTableRead("poData", "poTable");
+				this._setTableNoData(this.byId("poTable"), "No purchase orders found for plant " + sPlant + ".");
+				this._setRows("poData", this._poCache[sPlant]);
+				this._setNotice("poData-error", "", "Error");
+				return;
+			}
 			this._read("poData", "poTable", "/es_powiseset", [this._eq("werks", sPlant)],
 				"No purchase orders found for plant " + sPlant + ".",
-				function() {});
+				function(aRows) {
+					this._cacheRows(this._poCache, sPlant, aRows, 10);
+				}.bind(this));
 		},
 
 		_loadGrns: function(sPlant, sPo) {
@@ -206,20 +224,39 @@ sap.ui.define([
 				this._setNotice("validation", "Choose both a plant and a PO to load GRN details.", "Warning");
 				return;
 			}
-			this._read("grnData", "grnTable", "/es_grnset", [this._eq("werks", sPlant), this._eq("ebeln", sPo)],
+			var sFrom = this._formatODataDate(this._grnDateFrom);
+			var sTo = this._formatODataDate(this._grnDateTo);
+			var sCacheKey = [sPlant, sPo, sFrom, sTo].join("\u001f");
+			if (Object.prototype.hasOwnProperty.call(this._grnCache, sCacheKey)) {
+				this._cancelTableRead("grnData", "grnTable");
+				this._showGrnRows(this._grnCache[sCacheKey], sPlant, sPo);
+				return;
+			}
+			var aFilters = [this._eq("werks", sPlant), this._eq("ebeln", sPo)];
+			if (sFrom) { aFilters.push(new Filter("budat", FilterOperator.GE, sFrom)); }
+			if (sTo) { aFilters.push(new Filter("budat", FilterOperator.LE, sTo)); }
+			this._read("grnData", "grnTable", "/es_grnset", aFilters,
 				"No GRN documents found for PO " + sPo + " at plant " + sPlant + ".",
 				function(aRows) {
-					var oFiltered = this._applyGrnDateRange(aRows);
-					this._setRows("grnData", oFiltered.rows);
-					this._setTableNoData(this.byId("grnTable"), "No GRN documents match the selected date range.");
-					this.byId("grnFooter").setText("Showing " + oFiltered.rows.length + " material document" + (oFiltered.rows.length === 1 ? "" :
-							"s") +
-						" for PO " + sPo + " at plant " + sPlant + ".");
-					this._setNotice("grn-empty", oFiltered.rows.length ? "" : "No GRN documents match the selected plant, PO, and date range.",
-						"Information");
-					this._setNotice("date-format", oFiltered.unparsed ? oFiltered.unparsed +
-						" GRN row(s) had an unrecognized date and were excluded from the date range." : "", "Warning");
+					this._cacheRows(this._grnCache, sCacheKey, aRows, 5);
+					this._showGrnRows(aRows, sPlant, sPo);
 				}.bind(this));
+		},
+
+		_showGrnRows: function(aRows, sPlant, sPo) {
+			this._setRows("grnData", aRows);
+			this._setTableNoData(this.byId("grnTable"), "No GRN documents match the selected date range.");
+			this.byId("grnFooter").setText("Showing " + aRows.length + " material document" + (aRows.length === 1 ? "" : "s") +
+				" for PO " + sPo + " at plant " + sPlant + ".");
+			this._setNotice("grn-empty", aRows.length ? "" : "No GRN documents match the selected plant, PO, and date range.", "Information");
+			this._setNotice("date-format", "", "Warning");
+		},
+
+		_formatODataDate: function(oDate) {
+			if (!oDate) { return ""; }
+			var sMonth = String(oDate.getMonth() + 1).padStart(2, "0");
+			var sDay = String(oDate.getDate()).padStart(2, "0");
+			return String(oDate.getFullYear()) + sMonth + sDay;
 		},
 
 		_readDateRange: function() {
@@ -248,65 +285,8 @@ sap.ui.define([
 			};
 		},
 
-		_applyGrnDateRange: function(aRows) {
-			if (!this._grnDateFrom && !this._grnDateTo) {
-				return {
-					rows: aRows,
-					unparsed: 0
-				};
-			}
-			var iFrom = this._grnDateFrom ? this._dateKey(this._grnDateFrom) : null;
-			var iTo = this._grnDateTo ? this._dateKey(this._grnDateTo) : null;
-			var iUnparsed = 0;
-			var aFiltered = aRows.filter(function(oRow) {
-				var iDate = this._serviceDateKey(oRow.budat);
-				if (iDate === null) {
-					iUnparsed++;
-					return false;
-				}
-				return (iFrom === null || iDate >= iFrom) && (iTo === null || iDate <= iTo);
-			}.bind(this));
-			return {
-				rows: aFiltered,
-				unparsed: iUnparsed
-			};
-		},
-
 		_dateKey: function(oDate) {
 			return oDate.getFullYear() * 10000 + (oDate.getMonth() + 1) * 100 + oDate.getDate();
-		},
-
-		_serviceDateKey: function(vDate) {
-			if (vDate instanceof Date && !isNaN(vDate.getTime())) {
-				return this._dateKey(vDate);
-			}
-			var sDate = String(vDate == null ? "" : vDate).trim();
-			var aMatch = /\/Date\((\d+)\)\//.exec(sDate);
-			if (aMatch) {
-				var oParsed = new Date(parseInt(aMatch[1], 10));
-				return isNaN(oParsed.getTime()) ? null : this._dateKey(oParsed);
-			}
-			aMatch = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/.exec(sDate);
-			if (aMatch) {
-				return this._validatedDateKey(+aMatch[1], +aMatch[2], +aMatch[3]);
-			}
-			aMatch = /^(\d{4})(\d{2})(\d{2})$/.exec(sDate);
-			if (aMatch) {
-				return this._validatedDateKey(+aMatch[1], +aMatch[2], +aMatch[3]);
-			}
-			aMatch = /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.exec(sDate);
-			if (aMatch) {
-				return this._validatedDateKey(+aMatch[3], +aMatch[2], +aMatch[1]);
-			}
-			return null;
-		},
-
-		_validatedDateKey: function(iYear, iMonth, iDay) {
-			var oDate = new Date(iYear, iMonth - 1, iDay);
-			if (oDate.getFullYear() !== iYear || oDate.getMonth() !== iMonth - 1 || oDate.getDate() !== iDay) {
-				return null;
-			}
-			return this._dateKey(oDate);
 		},
 
 		_loadAllPlants: function(bForce) {
@@ -528,6 +508,13 @@ sap.ui.define([
 					this._setNotice(sModelName + "-error", this._errorText(oError), "Error");
 				}.bind(this)
 			};
+			var mSelectFields = {
+				poData: "ebeln,lifnr,lifnr_name,bedat,mblnr,mblnr_103,mblnr_105,completed,pending,rejected,cancelled,lgort",
+				grnData: "mblnr,bwart,lfbnr,xblnr,matnr,maktx,meins,menge,acqty,menge_i,rjqty,status,budat,budat_mkpf,cputm,lgort,usnam,bktxt,vend_age"
+			};
+			if (mSelectFields[sModelName]) {
+				mOptions.urlParameters = {"$select": mSelectFields[sModelName]};
+			}
 			if (aFilters && aFilters.length) {
 				mOptions.filters = aFilters;
 			}
@@ -582,6 +569,29 @@ sap.ui.define([
 			this.byId(sTableId).setBusy(false);
 			this._setTableNoData(this.byId(sTableId), sText);
 			this._setRows(sModelName, []);
+		},
+
+		_cancelTableRead: function(sModelName, sTableId) {
+			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
+			delete this._requestActive[sModelName];
+			this._endMainBusy("read:" + sModelName);
+			this.byId(sTableId).setBusy(false);
+		},
+
+		_cacheRows: function(oCache, sKey, aRows, iLimit) {
+			if (Object.prototype.hasOwnProperty.call(oCache, sKey)) {
+				delete oCache[sKey];
+			}
+			oCache[sKey] = aRows;
+			var aKeys = Object.keys(oCache);
+			while (aKeys.length > iLimit) {
+				delete oCache[aKeys.shift()];
+			}
+		},
+
+		_setDetailPanelState: function(sPlant, sPo) {
+			this.byId("poPanel").setExpanded(!!sPlant);
+			this.byId("grnPanel").setExpanded(!!sPlant && !!sPo);
 		},
 
 		_beginMainBusy: function(sKey) {
