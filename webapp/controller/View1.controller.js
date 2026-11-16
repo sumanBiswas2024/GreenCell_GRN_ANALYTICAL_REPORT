@@ -30,6 +30,9 @@ sap.ui.define([
 				cancelled: "0",
 				plantRows: "0"
 			}), "summary");
+			this.getView().setModel(new JSONModel({
+				poCount: "0", documentCount: "0", completed: "0", pending: "0", rejected: "0", cancelled: "0"
+			}), "poSummary");
 			this._activePlant = "";
 			this._activePo = "";
 			this._grnDateFrom = null;
@@ -64,6 +67,7 @@ sap.ui.define([
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
 			this._setDetailPanelState(sPlant, sPo);
+			this._resetPoSummary();
 			this._resetSummary();
 
 			this.byId("selectedPlant").setText(sPlant ? "Plant: " + sPlant : "All plants");
@@ -117,6 +121,7 @@ sap.ui.define([
 			this._notices = {};
 			this._renderNotices();
 			this._resetSummary();
+			this._resetPoSummary();
 			this.byId("selectedPlant").setText("All plants");
 			this.byId("selectedPo").setText("Select a PO");
 			this.byId("poInput").setPlaceholder("Select a plant first");
@@ -162,6 +167,7 @@ sap.ui.define([
 			this._renderNotices();
 			this._activePlant = oRow.werks;
 			this._updateCharts([oRow]);
+			this._setPoSummary(oRow);
 			this._activePo = "";
 			this._setDetailPanelState(oRow.werks, "");
 			this.byId("plantInput").setValue(oRow.werks);
@@ -388,6 +394,10 @@ sap.ui.define([
 				this.getView().getModel("plantChoices").setProperty("/rows", aRows);
 			}
 			this._setNotice("plant-empty", aRows.length ? "" : "No plant data is available for this request.", "Information");
+			if (this._activePlant) {
+				var oSelectedPlant = aRows.find(function(oRow) { return String(oRow.werks || "") === this._activePlant; }.bind(this));
+				this._setPoSummary(oSelectedPlant);
+			}
 			this._updateCharts(aRows);
 		},
 
@@ -560,6 +570,18 @@ sap.ui.define([
 				oSummary.setProperty("/" + sKey, "0");
 			});
 			this._updateCharts([]);
+		},
+
+		_setPoSummary: function(oPlant) {
+			var oModel = this.getView().getModel("poSummary");
+			["poCount", "documentCount", "completed", "pending", "rejected", "cancelled"].forEach(function(sKey) {
+				var sSource = sKey === "poCount" ? "ebeln" : sKey === "documentCount" ? "belnr" : sKey;
+				oModel.setProperty("/" + sKey, oPlant ? this._formatCount(oPlant[sSource]) : "0");
+			}.bind(this));
+		},
+
+		_resetPoSummary: function() {
+			this._setPoSummary(null);
 		},
 
 		_clearTable: function(sModelName, sTableId, sText) {

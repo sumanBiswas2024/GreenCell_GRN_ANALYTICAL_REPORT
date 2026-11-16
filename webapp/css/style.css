@@ -191,6 +191,18 @@ body,
     font-weight: 700;
 }
 
+.poToolbarMetric {
+    margin-inline: .25rem;
+    white-space: nowrap;
+}
+
+.poToolbarMetric .sapMObjStatusText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 2rem;
+	
+}
+
 .dataPanel .sapMListTblHeaderCell {
     background: #f3f7fb;
     border-color: #dce5ee;

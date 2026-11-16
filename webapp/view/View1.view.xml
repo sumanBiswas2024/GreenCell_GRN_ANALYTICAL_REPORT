@@ -130,7 +130,18 @@
 					</Panel>
 					<Panel id="poPanel" class="dataPanel" expandable="true" expanded="false">
 						<headerToolbar>
-							<Toolbar><core:Icon src="sap-icon://shipping-status"/><Title id="poTitle" text="PO-wise Summary" level="H2"/><ToolbarSpacer/><ObjectStatus id="selectedPlant" text="All plants" state="Information"/></Toolbar>
+							<Toolbar>
+								<core:Icon src="sap-icon://shipping-status"/>
+								<Title id="poTitle" text="PO-wise Summary" level="H2"/>
+								<ObjectStatus text="Total POs: {poSummary>/poCount}" class="poToolbarMetric"/>
+								<ObjectStatus text="Total Docs: {poSummary>/documentCount}" class="poToolbarMetric"/>
+								<ObjectStatus text="Completed: {poSummary>/completed}" state="Success" class="poToolbarMetric"/>
+								<ObjectStatus text="Pending: {poSummary>/pending}" state="Warning" class="poToolbarMetric"/>
+								<ObjectStatus text="Rejected: {poSummary>/rejected}" state="Error" class="poToolbarMetric"/>
+								<ObjectStatus text="Cancelled: {poSummary>/cancelled}" class="poToolbarMetric"/>
+								<ToolbarSpacer/>
+								<ObjectStatus id="selectedPlant" text="All plants" state="Information"/>
+							</Toolbar>
 						</headerToolbar>
 						<table:Table id="poTable" class="fixedDataTable" rows="{poData>/rows}" width="100%" height="25rem" visibleRowCount="10"
 							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPoSelect" enableColumnReordering="false"
