@@ -41,6 +41,7 @@ sap.ui.define([
 			this._grnDateTo = null;
 			this._requestIds = {};
 			this._requestActive = {};
+			this._requestSignatures = {};
 			this._poCache = Object.create(null);
 			this._grnCache = Object.create(null);
 			this._mainBusyRequests = {};
@@ -78,8 +79,18 @@ sap.ui.define([
 			this.byId("selectedPo").setText("Select a PO");
 			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			if (sPlant) {
-				this._read("plantData", "plantTable", "/es_plant_wiseset", [this._eq("werks", sPlant)],
-					"No plants found for the selected filter.", this._onPlantData.bind(this));
+				if (this._allPlantsLoaded) {
+					this._cancelTableRead("plantData", "plantTable");
+					var aPlantRows = this._allPlantRows.filter(function(oRow) {
+						return String(oRow.werks || "") === sPlant;
+					});
+					this._setTableNoData(this.byId("plantTable"), "No plants found for the selected filter.");
+					this._setRows("plantData", aPlantRows);
+					this._onPlantData(aPlantRows);
+				} else {
+					this._read("plantData", "plantTable", "/es_plant_wiseset", [this._eq("werks", sPlant)],
+						"No plants found for the selected filter.", this._onPlantData.bind(this));
+				}
 				this.byId("poInput").setPlaceholder("Enter or select a PO");
 				this._loadPos(sPlant);
 				if (sPo) {
@@ -107,6 +118,7 @@ sap.ui.define([
 		},
 
 		onReset: function() {
+			this._clearTableSelections();
 			this.byId("plantInput").setValue("");
 			this.byId("poInput").setValue("");
 			this.byId("grnDateFrom").setValue("");
@@ -115,6 +127,7 @@ sap.ui.define([
 		},
 
 		onRefresh: function() {
+			this._clearTableSelections();
 			this.byId("plantInput").setValue("");
 			this.byId("poInput").setValue("");
 			this.byId("grnDateFrom").setValue("");
@@ -383,6 +396,9 @@ sap.ui.define([
 			}
 			try {
 				oModel.read("/es_plant_wiseset", {
+					urlParameters: {
+						"$select": "werks,plant_name,ebeln,belnr,completed,pending,rejected,cancelled"
+					},
 					success: function(oData) {
 						if (iRequestId !== this._allPlantsRequestId) {
 							return;
@@ -539,9 +555,21 @@ sap.ui.define([
 		_read: function(sModelName, sTableId, sPath, aFilters, sEmptyText, fnSuccess) {
 			var oModel = this.getOwnerComponent().getModel();
 			var oTable = this.byId(sTableId);
+			var mSelectFields = {
+				plantData: "werks,plant_name,ebeln,belnr,completed,pending,rejected,cancelled",
+				poData: "ebeln,lifnr,lifnr_name,bedat,mblnr,mblnr_103,mblnr_105,completed,pending,rejected,cancelled,lgort",
+				grnData: "mblnr,bwart,lfbnr,xblnr,matnr,maktx,meins,menge,acqty,menge_i,rjqty,status,budat,budat_mkpf,cputm,lgort,usnam,bktxt,vend_age"
+			};
+			var sSignature = sPath + "|" + (aFilters || []).map(function(oFilter) {
+				return [oFilter.sPath, oFilter.sOperator, oFilter.oValue1, oFilter.oValue2].join(":");
+			}).join("|") + "|" + (mSelectFields[sModelName] || "");
+			if (this._requestActive[sModelName] && this._requestSignatures[sModelName] === sSignature) {
+				return;
+			}
 			var iRequestId = (this._requestIds[sModelName] || 0) + 1;
 			this._requestIds[sModelName] = iRequestId;
 			this._requestActive[sModelName] = iRequestId;
+			this._requestSignatures[sModelName] = sSignature;
 			this._endMainBusy("read:" + sModelName);
 			this._beginMainBusy("read:" + sModelName);
 			oTable.setBusy(true);
@@ -559,6 +587,7 @@ sap.ui.define([
 						return;
 					}
 					delete this._requestActive[sModelName];
+					delete this._requestSignatures[sModelName];
 					this._endMainBusy("read:" + sModelName);
 					oTable.setBusy(false);
 					this._setNotice(sModelName + "-error", "", "Error");
@@ -572,16 +601,13 @@ sap.ui.define([
 						return;
 					}
 					delete this._requestActive[sModelName];
+					delete this._requestSignatures[sModelName];
 					this._endMainBusy("read:" + sModelName);
 					oTable.setBusy(false);
 					this._setRows(sModelName, []);
 					this._setTableNoData(oTable, "Data could not be loaded. Check the message above and try again.");
 					this._setNotice(sModelName + "-error", this._errorText(oError), "Error");
 				}.bind(this)
-			};
-			var mSelectFields = {
-				poData: "ebeln,lifnr,lifnr_name,bedat,mblnr,mblnr_103,mblnr_105,completed,pending,rejected,cancelled,lgort",
-				grnData: "mblnr,bwart,lfbnr,xblnr,matnr,maktx,meins,menge,acqty,menge_i,rjqty,status,budat,budat_mkpf,cputm,lgort,usnam,bktxt,vend_age"
 			};
 			if (mSelectFields[sModelName]) {
 				mOptions.urlParameters = {"$select": mSelectFields[sModelName]};
@@ -594,6 +620,7 @@ sap.ui.define([
 			} catch (oError) {
 				if (this._requestIds[sModelName] === iRequestId) {
 					delete this._requestActive[sModelName];
+					delete this._requestSignatures[sModelName];
 					this._endMainBusy("read:" + sModelName);
 					oTable.setBusy(false);
 					this._setRows(sModelName, []);
@@ -648,6 +675,7 @@ sap.ui.define([
 		_clearTable: function(sModelName, sTableId, sText) {
 			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
 			delete this._requestActive[sModelName];
+			delete this._requestSignatures[sModelName];
 			this._endMainBusy("read:" + sModelName);
 			if (sModelName === "grnData") {
 				this._grnSourceRows = [];
@@ -661,8 +689,14 @@ sap.ui.define([
 		_cancelTableRead: function(sModelName, sTableId) {
 			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
 			delete this._requestActive[sModelName];
+			delete this._requestSignatures[sModelName];
 			this._endMainBusy("read:" + sModelName);
 			this.byId(sTableId).setBusy(false);
+		},
+
+		_clearTableSelections: function() {
+			this.byId("plantTable").clearSelection();
+			this.byId("poTable").clearSelection();
 		},
 
 		_cacheRows: function(oCache, sKey, aRows, iLimit) {
