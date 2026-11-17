@@ -55,7 +55,7 @@
 										</headerToolbar>
 										<content>
 											<table:Table id="plantTable" class="fixedDataTable plantDetailsTable" rows="{plantData>/rows}" width="100%" height="40rem"
-												visibleRowCount="11" visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPlantSelect"
+												visibleRowCount="11" visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="RowOnly" rowSelectionChange="onPlantSelect"
 												enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
 												<table:noData><Text text="No plant records found"/></table:noData>
 												<table:columns>
@@ -144,7 +144,7 @@
 							</Toolbar>
 						</headerToolbar>
 						<table:Table id="poTable" class="fixedDataTable" rows="{poData>/rows}" width="100%" height="25rem" visibleRowCount="10"
-							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="Row" rowSelectionChange="onPoSelect" enableColumnReordering="false"
+							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="RowOnly" rowSelectionChange="onPoSelect" enableColumnReordering="false"
 							enableBusyIndicator="true" busyIndicatorDelay="150">
 							<table:noData><Text text="Select a plant to load purchase orders"/></table:noData>
 							<table:columns>

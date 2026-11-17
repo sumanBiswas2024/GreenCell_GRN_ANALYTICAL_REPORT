@@ -340,6 +340,17 @@ body,
     font-weight: 700;
 }
 
+.fixedDataTable .sapUiTableRowSel > td,
+.fixedDataTable .sapUiTableRowSel .sapUiTableCell {
+    background-color: #dceeff !important;
+}
+
+.fixedDataTable .sapUiTableRowSel .sapUiTableCellFirst,
+.fixedDataTable .sapUiTableRowSel > .sapUiTableCell:first-child {
+    background-color: #c6e3fa !important;
+    box-shadow: inset 4px 0 0 #0a6ed1;
+}
+
 .fixedDataTable .sapUiTableVSb,
 .fixedDataTable .sapUiTableHSb {
     visibility: visible !important;
