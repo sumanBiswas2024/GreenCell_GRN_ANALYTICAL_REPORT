@@ -118,6 +118,26 @@ body,
     box-shadow: 0 5px 14px rgba(24, 55, 82, .16);
 }
 
+.kpiContent {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: .65rem;
+}
+
+.kpiIcon {
+    flex: 0 0 1.45rem;
+    width: 1.45rem;
+    color: rgba(255, 255, 255, .96);
+    font-size: 1.35rem;
+    text-align: center;
+}
+
+.kpiText {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .kpiLabel {
     margin-bottom: .25rem;
     color: rgba(255, 255, 255, .85);

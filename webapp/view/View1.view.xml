@@ -29,8 +29,8 @@
 							<VBox class="filterField dateField"><Label text="GRN Date To"/><DatePicker id="grnDateTo" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/></VBox>
 							<VBox class="filterActions"><Button text="Go" type="Emphasized" icon="sap-icon://search" press="onGo"/><Button text="Reset" press="onReset"/></VBox>
 						</HBox>
-						<Text text="Leave Plant blank to load all plants. GRN date range filters document details; select a plant and PO to view them."
-							class="filterHint"/>
+						<!--<Text text="Leave Plant blank to load all plants. GRN date range filters document details; select a plant and PO to view them."-->
+						<!--	class="filterHint"/>-->
 					</VBox>
 					<MessageStrip id="messageStrip" visible="false" showIcon="true" type="Information" class="messageStrip"/>
 					<Panel id="plantSummaryPanel" class="dataPanel summaryPanel" expandable="false">
@@ -39,13 +39,13 @@
 						</headerToolbar>
 						<content>
 							<HBox wrap="Wrap" class="kpiRow">
-								<VBox class="kpiCard kpiBlue"><Text text="TOTAL PLANTS" class="kpiLabel"/><ObjectNumber number="{summary>/plantCount}"/></VBox>
-								<VBox class="kpiCard kpiCyan"><Text text="TOTAL POs" class="kpiLabel"/><ObjectNumber number="{summary>/poCount}"/></VBox>
-								<VBox class="kpiCard kpiTeal"><Text text="MATERIAL DOCUMENTS" class="kpiLabel"/><ObjectNumber number="{summary>/documentCount}"/></VBox>
-								<VBox class="kpiCard kpiGreen"><Text text="COMPLETED" class="kpiLabel"/><ObjectNumber number="{summary>/completed}" state="Success"/></VBox>
-								<VBox class="kpiCard kpiAmber"><Text text="PENDING" class="kpiLabel"/><ObjectNumber number="{summary>/pending}" state="Warning"/></VBox>
-								<VBox class="kpiCard kpiRed"><Text text="REJECTED" class="kpiLabel"/><ObjectNumber number="{summary>/rejected}" state="Error"/></VBox>
-								<VBox class="kpiCard kpiSlate"><Text text="CANCELLED" class="kpiLabel"/><ObjectNumber number="{summary>/cancelled}"/></VBox>
+								<VBox class="kpiCard kpiBlue"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://factory" class="kpiIcon"/><VBox class="kpiText"><Text text="TOTAL PLANTS" class="kpiLabel"/><ObjectNumber number="{summary>/plantCount}"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiCyan"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sales-order" class="kpiIcon"/><VBox class="kpiText"><Text text="TOTAL POs" class="kpiLabel"/><ObjectNumber number="{summary>/poCount}"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiTeal"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://documents" class="kpiIcon"/><VBox class="kpiText"><Text text="MATERIAL DOCUMENTS" class="kpiLabel"/><ObjectNumber number="{summary>/documentCount}"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiGreen"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-positive" class="kpiIcon"/><VBox class="kpiText"><Text text="COMPLETED" class="kpiLabel"/><ObjectNumber number="{summary>/completed}" state="Success"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiAmber"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://pending" class="kpiIcon"/><VBox class="kpiText"><Text text="PENDING" class="kpiLabel"/><ObjectNumber number="{summary>/pending}" state="Warning"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiRed"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-negative" class="kpiIcon"/><VBox class="kpiText"><Text text="REJECTED" class="kpiLabel"/><ObjectNumber number="{summary>/rejected}" state="Error"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiSlate"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sys-cancel" class="kpiIcon"/><VBox class="kpiText"><Text text="CANCELLED" class="kpiLabel"/><ObjectNumber number="{summary>/cancelled}"/></VBox></HBox></VBox>
 							</HBox>
 							<HBox wrap="NoWrap" class="plantDashboard">
 								<VBox class="dashboardDetails">
