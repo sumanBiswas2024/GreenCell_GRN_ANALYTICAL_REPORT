@@ -516,6 +516,17 @@ body,
     margin-inline: .4rem;
 }
 
+.grnToolbarMetric {
+    margin-inline: .2rem;
+    white-space: nowrap;
+}
+
+.grnToolbarMetric .sapMObjStatusText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 1rem;
+}
+
 .tableFooter .sapMText {
     color: #526a80;
     font-size: .75rem;

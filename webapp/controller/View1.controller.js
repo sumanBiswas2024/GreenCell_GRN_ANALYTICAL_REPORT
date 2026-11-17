@@ -21,6 +21,13 @@ sap.ui.define([
 				rows: []
 			}), "topPlantChart");
 			this.getView().setModel(new JSONModel({
+				totalDocuments: "0",
+				completed: "0",
+				pending: "0",
+				rejected: "0",
+				cancelled: "0"
+			}), "grnSummary");
+			this.getView().setModel(new JSONModel({
 				plantCount: "0",
 				poCount: "0",
 				documentCount: "0",
@@ -254,6 +261,7 @@ sap.ui.define([
 				return;
 			}
 			this._grnSourceRows = [];
+			this._setGrnStatusCounts([]);
 			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			var sFrom = this._formatODataDate(this._grnDateFrom);
 			var sTo = this._formatODataDate(this._grnDateTo);
@@ -276,6 +284,7 @@ sap.ui.define([
 
 		_showGrnRows: function(aRows, sPlant, sPo) {
 			this._grnSourceRows = aRows;
+			this._setGrnStatusCounts(aRows);
 			this.byId("selectedGrnPlant").setText(this._plantToolbarText(sPlant, this._activePlantName));
 			this.byId("selectedPo").setText("PO: " + sPo);
 			this._applyGrnStatusFilter();
@@ -298,6 +307,41 @@ sap.ui.define([
 			var sStatusLabel = sStatus === "ALL" ? "all statuses" : sStatus.toLowerCase();
 			this.byId("grnFooter").setText("Showing " + aVisibleRows.length + " of " + aRows.length + " material documents (" + sStatusLabel + ").");
 			this._setNotice("grn-empty", aVisibleRows.length ? "" : "No GRN documents match the selected plant, PO, date range, and status.", "Information");
+		},
+
+		_setGrnStatusCounts: function(aRows) {
+			var aDocuments = aRows || [];
+			var mCounts = {totalDocuments: aDocuments.length, completed: 0, pending: 0, rejected: 0, cancelled: 0};
+			aDocuments.forEach(function(oRow) {
+				var sStatus = String(oRow.status || "").trim().toLowerCase();
+				if (sStatus === "completed") {
+					mCounts.completed++;
+				} else if (sStatus === "pending") {
+					mCounts.pending++;
+				} else if (sStatus === "rejected") {
+					mCounts.rejected++;
+				} else if (sStatus === "cancelled" || sStatus === "canceled") {
+					mCounts.cancelled++;
+				}
+			});
+			var oSummary = this.getView().getModel("grnSummary");
+			Object.keys(mCounts).forEach(function(sStatus) {
+				oSummary.setProperty("/" + sStatus, this._formatCount(mCounts[sStatus]));
+			}.bind(this));
+		},
+
+		formatGrnStatusState: function(sStatus) {
+			var sNormalizedStatus = String(sStatus || "").trim().toLowerCase();
+			if (sNormalizedStatus === "completed") {
+				return "Success";
+			}
+			if (sNormalizedStatus === "pending") {
+				return "Warning";
+			}
+			if (sNormalizedStatus === "rejected") {
+				return "Error";
+			}
+			return "None";
 		},
 
 		_formatODataDate: function(oDate) {
@@ -334,7 +378,7 @@ sap.ui.define([
 		},
 
 		_plantToolbarText: function(sPlant, sPlantName) {
-			return "Plant: " + sPlant + (sPlantName ? " · " + sPlantName : "");
+			return "Plant: " + sPlant;
 		},
 
 		_readDateRange: function() {
@@ -679,6 +723,7 @@ sap.ui.define([
 			this._endMainBusy("read:" + sModelName);
 			if (sModelName === "grnData") {
 				this._grnSourceRows = [];
+				this._setGrnStatusCounts([]);
 				this.byId("grnStatusFilter").setSelectedKey("ALL");
 			}
 			this.byId(sTableId).setBusy(false);

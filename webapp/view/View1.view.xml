@@ -203,7 +203,13 @@
 						<headerToolbar>
 							<Toolbar>
 								<core:Icon src="sap-icon://document-text"/>
-								<Title id="grnTitle" text="GRN / Material Document Details" level="H2"/>
+								<Title id="grnTitle" text="GRN / Material Document Details" level="H3"/>
+								<ToolbarSpacer/>
+								<ObjectStatus id="grnTotalCount" text="Total Docs: {grnSummary>/totalDocuments}" class="grnToolbarMetric"/>
+								<ObjectStatus id="grnCompletedCount" text="Completed: {grnSummary>/completed}" state="Success" class="grnToolbarMetric"/>
+								<ObjectStatus id="grnPendingCount" text="Pending: {grnSummary>/pending}" state="Warning" class="grnToolbarMetric"/>
+								<ObjectStatus id="grnRejectedCount" text="Rejected: {grnSummary>/rejected}" state="Error" class="grnToolbarMetric"/>
+								<ObjectStatus id="grnCancelledCount" text="Cancelled: {grnSummary>/cancelled}" class="grnToolbarMetric"/>
 								<ToolbarSpacer/>
 								<Select id="grnStatusFilter" class="grnStatusFilter" width="9rem" selectedKey="ALL" change="onGrnStatusChange" tooltip="Filter GRN documents by status">
 									<items>
@@ -214,7 +220,6 @@
 										<core:Item key="CANCELLED" text="Cancelled"/>
 									</items>
 								</Select>
-								<ToolbarSpacer/>
 								<ObjectStatus id="selectedGrnPlant" text="Select a plant" state="Information"/>
 								<ObjectStatus id="selectedPo" text="Select a PO" state="Information"/>
 							</Toolbar>
@@ -269,7 +274,7 @@
 								</table:Column>
 								<table:Column width="8rem">
 									<table:label><Label text="Status"/></table:label>
-									<table:template><ObjectStatus text="{grnData>status}"/></table:template>
+									<table:template><ObjectStatus text="{grnData>status}" state="{path: 'grnData>status', formatter: '.formatGrnStatusState'}"/></table:template>
 								</table:Column>
 								<table:Column width="10rem">
 									<table:label><Label text="GRN Date"/></table:label>
