@@ -226,7 +226,7 @@
 						</headerToolbar>
 						<table:Table id="grnTable" class="fixedDataTable" rows="{grnData>/rows}" width="100%" height="25rem" visibleRowCount="10"
 							visibleRowCountMode="Fixed" selectionMode="None" enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
-							<table:noData><Text text="Select a plant and PO to load GRN documents"/></table:noData>
+							<table:noData><Text text="Select a plant to load GRN documents"/></table:noData>
 							<table:columns>
 								<table:Column width="10rem">
 									<table:label><Label text="Material Document"/></table:label>

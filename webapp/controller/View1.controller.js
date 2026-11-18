@@ -77,13 +77,13 @@ sap.ui.define([
 			}
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
-			this._setDetailPanelState(sPlant, sPo);
+			this._setDetailPanelState(sPlant, sPo || sPlant);
 			this._resetPoSummary();
 			this._resetSummary();
 
 			this.byId("selectedPlant").setText(sPlant ? "Plant: " + sPlant : "All plants");
 			this.byId("selectedGrnPlant").setText(sPlant ? this._plantToolbarText(sPlant, this._activePlantName) : "Select a plant");
-			this.byId("selectedPo").setText("Select a PO");
+			this.byId("selectedPo").setText(sPo ? "PO: " + sPo : sPlant ? "All POs" : "Select a PO");
 			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			if (sPlant) {
 				if (this._allPlantsLoaded) {
@@ -102,24 +102,22 @@ sap.ui.define([
 				this._loadPos(sPlant);
 				if (sPo) {
 					this._activePo = sPo;
-					this.byId("selectedPo").setText("PO: " + sPo);
-					this._loadGrns(sPlant, sPo);
-				} else {
-					this._clearTable("grnData", "grnTable", "Enter or select a PO to view GRN details.");
-					this.byId("grnFooter").setText("Select a PO to view its GRN documents.");
 				}
+				this.byId("grnFooter").setText(sPo ? "Loading GRN documents for PO " + sPo + " at plant " + sPlant + "." :
+					"Loading GRN documents for plant " + sPlant + ".");
+				this._loadGrns(sPlant, sPo);
 			} else {
 				this._requestIds.plantData = (this._requestIds.plantData || 0) + 1;
 				delete this._requestActive.plantData;
 				this.byId("poInput").setPlaceholder("Select a plant first");
 				this._loadAllPlants(false);
 				this._clearTable("poData", "poTable", "Choose a plant to load its purchase orders.");
-				this._clearTable("grnData", "grnTable", "Choose a plant and PO to load GRN documents.");
-				this.byId("grnFooter").setText("Select a plant and PO to view GRN documents.");
+				this._clearTable("grnData", "grnTable", "Choose a plant to load GRN documents.");
+				this.byId("grnFooter").setText("Select a plant to view GRN documents.");
 				if (sPo) {
 					this._setNotice("validation", "Select a plant before loading GRN details for a PO.", "Warning");
 				} else if (this._grnDateFrom || this._grnDateTo) {
-					this._setNotice("date-filter", "Choose a plant and PO to apply the GRN date range to document details.", "Information");
+					this._setNotice("date-filter", "Choose a plant to apply the GRN date range to document details.", "Information");
 				}
 			}
 		},
@@ -156,8 +154,8 @@ sap.ui.define([
 			this._setDetailPanelState("", "");
 			this._clearTable("plantData", "plantTable", "Loading all plants…");
 			this._clearTable("poData", "poTable", "Choose a plant to load its purchase orders.");
-			this._clearTable("grnData", "grnTable", "Choose a plant and PO to load GRN documents.");
-			this.byId("grnFooter").setText("Select a plant and PO to view GRN documents.");
+			this._clearTable("grnData", "grnTable", "Choose a plant to load GRN documents.");
+			this.byId("grnFooter").setText("Select a plant to view GRN documents.");
 			this._allPlantsLoaded = false;
 			this._allPlantRows = [];
 			this._poCache = Object.create(null);
@@ -198,16 +196,24 @@ sap.ui.define([
 			this._updateCharts([oRow]);
 			this._setPoSummary(oRow);
 			this._activePo = "";
-			this._setDetailPanelState(oRow.werks, "");
+			this._setDetailPanelState(oRow.werks, oRow.werks);
+			var oDateRange = this._readDateRange();
 			this.byId("plantInput").setValue(oRow.werks);
 			this.byId("poInput").setValue("");
 			this.byId("poInput").setPlaceholder("Enter or select a PO");
 			this.byId("selectedPlant").setText("Plant: " + oRow.werks);
 			this.byId("selectedGrnPlant").setText(this._plantToolbarText(oRow.werks, oRow.plant_name));
-			this.byId("selectedPo").setText("Select a PO");
+			this.byId("selectedPo").setText("All POs");
 			this._loadPos(oRow.werks);
-			this._clearTable("grnData", "grnTable", "Choose a PO to load GRN documents.");
-			this.byId("grnFooter").setText("Select a PO to view its GRN documents.");
+			if (oDateRange.error) {
+				this._clearTable("grnData", "grnTable", oDateRange.error);
+				this._setNotice("validation", oDateRange.error, "Warning");
+			} else {
+				this._grnDateFrom = oDateRange.from;
+				this._grnDateTo = oDateRange.to;
+				this.byId("grnFooter").setText("Loading GRN documents for plant " + oRow.werks + ".");
+				this._loadGrns(oRow.werks, "");
+			}
 			this._scrollTo("poPanel");
 		},
 
@@ -256,37 +262,76 @@ sap.ui.define([
 		},
 
 		_loadGrns: function(sPlant, sPo) {
-			if (!sPlant || !sPo) {
-				this._setNotice("validation", "Choose both a plant and a PO to load GRN details.", "Warning");
+			if (!sPlant) {
+				this._setNotice("validation", "Choose a plant to load GRN details.", "Warning");
 				return;
 			}
+			sPo = sPo || "";
 			this._grnSourceRows = [];
 			this._setGrnStatusCounts([]);
 			this.byId("grnStatusFilter").setSelectedKey("ALL");
 			var sFrom = this._formatODataDate(this._grnDateFrom);
 			var sTo = this._formatODataDate(this._grnDateTo);
-			var sCacheKey = [sPlant, sPo, sFrom, sTo].join("\u001f");
+			var sCacheKey = [sPlant, sPo || "*", sFrom, sTo].join("\u001f");
 			if (Object.prototype.hasOwnProperty.call(this._grnCache, sCacheKey)) {
 				this._cancelTableRead("grnData", "grnTable");
 				this._showGrnRows(this._grnCache[sCacheKey], sPlant, sPo);
 				return;
 			}
-			var aFilters = [this._eq("werks", sPlant), this._eq("ebeln", sPo)];
+			var aFilters = [this._eq("werks", sPlant)];
+			if (sPo) {
+				aFilters.push(this._eq("ebeln", sPo));
+			}
 			if (sFrom) { aFilters.push(new Filter("budat", FilterOperator.GE, sFrom)); }
 			if (sTo) { aFilters.push(new Filter("budat", FilterOperator.LE, sTo)); }
-			this._read("grnData", "grnTable", "/es_grnset", aFilters,
-				"No GRN documents found for PO " + sPo + " at plant " + sPlant + ".",
+			var sEmptyText = sPo ? "No GRN documents found for PO " + sPo + " at plant " + sPlant + "." :
+				"No GRN documents found for plant " + sPlant + " in the selected date range.";
+			this._read("grnData", "grnTable", "/es_grnset", aFilters, sEmptyText,
 				function(aRows) {
-					this._cacheRows(this._grnCache, sCacheKey, aRows, 5);
-					this._showGrnRows(aRows, sPlant, sPo);
+					var aDateFilteredRows = this._filterGrnRowsByDate(aRows, this._grnDateFrom, this._grnDateTo);
+					this._cacheRows(this._grnCache, sCacheKey, aDateFilteredRows, 5);
+					this._showGrnRows(aDateFilteredRows, sPlant, sPo);
 				}.bind(this));
+		},
+
+		_filterGrnRowsByDate: function(aRows, oFrom, oTo) {
+			if (!oFrom && !oTo) {
+				return aRows;
+			}
+			var iFrom = oFrom ? this._dateKey(oFrom) : null;
+			var iTo = oTo ? this._dateKey(oTo) : null;
+			return (aRows || []).filter(function(oRow) {
+				var iGrnDate = this._grnDateValueKey(oRow.budat);
+				return iGrnDate !== null && (iFrom === null || iGrnDate >= iFrom) && (iTo === null || iGrnDate <= iTo);
+			}.bind(this));
+		},
+
+		_grnDateValueKey: function(vDate) {
+			if (vDate instanceof Date && !isNaN(vDate.getTime())) {
+				return this._dateKey(vDate);
+			}
+			var sDate = String(vDate == null ? "" : vDate).trim();
+			var aMatch = /^(\d{4})(\d{2})(\d{2})$/.exec(sDate) || /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:$|T)/.exec(sDate);
+			if (aMatch) {
+				return Number(aMatch[1]) * 10000 + Number(aMatch[2]) * 100 + Number(aMatch[3]);
+			}
+			aMatch = /^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/.exec(sDate);
+			if (aMatch) {
+				return Number(aMatch[3]) * 10000 + Number(aMatch[2]) * 100 + Number(aMatch[1]);
+			}
+			aMatch = /^\/Date\((\d+)\)\/$/.exec(sDate);
+			if (aMatch) {
+				var oParsedDate = new Date(Number(aMatch[1]));
+				return isNaN(oParsedDate.getTime()) ? null : this._dateKey(oParsedDate);
+			}
+			return null;
 		},
 
 		_showGrnRows: function(aRows, sPlant, sPo) {
 			this._grnSourceRows = aRows;
 			this._setGrnStatusCounts(aRows);
 			this.byId("selectedGrnPlant").setText(this._plantToolbarText(sPlant, this._activePlantName));
-			this.byId("selectedPo").setText("PO: " + sPo);
+			this.byId("selectedPo").setText(sPo ? "PO: " + sPo : "All POs");
 			this._applyGrnStatusFilter();
 			this._setNotice("date-format", "", "Warning");
 		},
@@ -302,11 +347,12 @@ sap.ui.define([
 				return String(oRow.status || "").trim().toUpperCase() === sStatus;
 			});
 			this._setRows("grnData", aVisibleRows);
+			var sFilterScope = this._activePo ? "selected plant, PO, and date range" : "selected plant and date range";
 			this._setTableNoData(this.byId("grnTable"), sStatus === "ALL" ?
-				"No GRN documents match the selected plant, PO, and date range." : "No " + sStatus.toLowerCase() + " GRN documents match the selected plant, PO, and date range.");
+				"No GRN documents match the " + sFilterScope + "." : "No " + sStatus.toLowerCase() + " GRN documents match the " + sFilterScope + ".");
 			var sStatusLabel = sStatus === "ALL" ? "all statuses" : sStatus.toLowerCase();
 			this.byId("grnFooter").setText("Showing " + aVisibleRows.length + " of " + aRows.length + " material documents (" + sStatusLabel + ").");
-			this._setNotice("grn-empty", aVisibleRows.length ? "" : "No GRN documents match the selected plant, PO, date range, and status.", "Information");
+			this._setNotice("grn-empty", aVisibleRows.length ? "" : "No GRN documents match the " + sFilterScope + " and status.", "Information");
 		},
 
 		_setGrnStatusCounts: function(aRows) {
