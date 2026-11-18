@@ -26,14 +26,10 @@
 								</Input>
 							</VBox>
 							<VBox class="filterField dateField"><Label text="GRN Date From"/>
-								<HBox class="datePickerField"><DatePicker id="grnDateFrom" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd"
-									placeholder="DD.MM.YYYY"/><Button id="grnDateFromClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date From"
-									visible="false" press="onClearDateFrom"/></HBox>
+								<DatePicker id="grnDateFrom" width="100%" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/>
 							</VBox>
 							<VBox class="filterField dateField"><Label text="GRN Date To"/>
-								<HBox class="datePickerField"><DatePicker id="grnDateTo" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd"
-									placeholder="DD.MM.YYYY"/><Button id="grnDateToClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date To" visible="false"
-									press="onClearDateTo"/></HBox>
+								<DatePicker id="grnDateTo" width="100%" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/>
 							</VBox>
 							<VBox class="filterActions"><Button text="Go" type="Emphasized" icon="sap-icon://search" press="onGo"/><Button text="Reset" press="onReset"/></VBox>
 						</HBox>

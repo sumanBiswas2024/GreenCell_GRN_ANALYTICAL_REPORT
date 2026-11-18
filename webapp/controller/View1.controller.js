@@ -204,27 +204,6 @@ sap.ui.define([
 			}
 		},
 
-		onDateFilterChange: function(oEvent) {
-			var oDatePicker = oEvent.getSource();
-			var sClearId = oDatePicker === this.byId("grnDateFrom") ? "grnDateFromClear" : "grnDateToClear";
-			this.byId(sClearId).setVisible(!!oDatePicker.getValue().trim());
-		},
-
-		onClearDateFrom: function() {
-			this._clearDatePicker("grnDateFrom", "grnDateFromClear");
-		},
-
-		onClearDateTo: function() {
-			this._clearDatePicker("grnDateTo", "grnDateToClear");
-		},
-
-		_clearDatePicker: function(sPickerId, sButtonId) {
-			var oDatePicker = this.byId(sPickerId);
-			oDatePicker.setDateValue(null);
-			oDatePicker.setValue("");
-			this.byId(sButtonId).setVisible(false);
-		},
-
 		onPlantSelect: function(oEvent) {
 			var oTable = this.byId("plantTable");
 			var iRow = oEvent.getParameter("rowIndex");
