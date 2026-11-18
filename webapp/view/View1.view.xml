@@ -14,19 +14,19 @@
 						<Label text="Report filters" class="sectionEyebrow"/>
 						<HBox wrap="Wrap" class="filterRow">
 							<VBox class="filterField"><Label text="Plant"/>
-								<Input id="plantInput" placeholder="Enter a plant" showSuggestion="true" filterSuggests="true" startSuggestion="1"
+								<Input id="plantInput" placeholder="Enter a plant" showClearIcon="true" showSuggestion="true" filterSuggests="true" startSuggestion="1"
 									suggestionItemSelected="onPlantSuggestionSelected" suggestionItems="{plantChoices>/rows}">
 									<suggestionItems><core:ListItem key="{plantChoices>werks}" text="{plantChoices>werks}" additionalText="{plantChoices>plant_name}"/></suggestionItems>
 								</Input>
 							</VBox>
 							<VBox class="filterField"><Label text="PO Number"/>
-								<Input id="poInput" placeholder="Select a plant first" showSuggestion="true" filterSuggests="true" startSuggestion="1"
-									suggestionItemSelected="onPoSuggestionSelected" suggestionItems="{poData>/rows}">
+								<Input id="poInput" placeholder="Select a plant first" showClearIcon="true" showSuggestion="true" filterSuggests="true" startSuggestion="1"
+									liveChange="onPoInputLiveChange" suggestionItemSelected="onPoSuggestionSelected" suggestionItems="{poData>/rows}">
 									<suggestionItems><core:ListItem key="{poData>ebeln}" text="{poData>ebeln}" additionalText="{poData>lifnr_name}"/></suggestionItems>
 								</Input>
 							</VBox>
-							<VBox class="filterField dateField"><Label text="GRN Date From"/><DatePicker id="grnDateFrom" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/></VBox>
-							<VBox class="filterField dateField"><Label text="GRN Date To"/><DatePicker id="grnDateTo" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/></VBox>
+							<VBox class="filterField dateField"><Label text="GRN Date From"/><HBox class="datePickerField"><DatePicker id="grnDateFrom" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/><Button id="grnDateFromClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date From" visible="false" press="onClearDateFrom"/></HBox></VBox>
+							<VBox class="filterField dateField"><Label text="GRN Date To"/><HBox class="datePickerField"><DatePicker id="grnDateTo" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/><Button id="grnDateToClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date To" visible="false" press="onClearDateTo"/></HBox></VBox>
 							<VBox class="filterActions"><Button text="Go" type="Emphasized" icon="sap-icon://search" press="onGo"/><Button text="Reset" press="onReset"/></VBox>
 						</HBox>
 						<!--<Text text="Leave Plant blank to load all plants. GRN date range filters document details; select a plant and PO to view them."-->

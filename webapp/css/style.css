@@ -67,6 +67,34 @@ body,
     max-width: none;
 }
 
+.datePickerField {
+    position: relative;
+    width: 100%;
+}
+
+.datePickerField .sapMInputBase {
+    width: 100%;
+}
+
+.datePickerField .sapMInputBaseInner {
+    padding-right: 4.2rem;
+}
+
+.dateClearButton {
+    position: absolute;
+    z-index: 2;
+    top: .15rem;
+    right: 2.35rem;
+    width: 1.8rem;
+    height: 2rem;
+}
+
+.dateClearButton .sapMBtnInner {
+    min-width: 1.8rem;
+    border: 0;
+    background: transparent;
+}
+
 .filterField .sapMLabel {
     margin-bottom: .25rem;
     color: #42596f;

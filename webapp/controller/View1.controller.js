@@ -48,6 +48,8 @@ sap.ui.define([
 			this._activePlant = "";
 			this._activePlantName = "";
 			this._activePo = "";
+			this._appliedPoFilter = "";
+			this._poSelectionSource = "none";
 			this._grnSourceRows = [];
 			this._grnRangeRows = [];
 			this._grnRangeLoaded = false;
@@ -63,6 +65,8 @@ sap.ui.define([
 			this._grnCache = Object.create(null);
 			this._mainBusyRequests = {};
 			this._mainBusyCount = 0;
+			this._cachedDisplayIds = {};
+			this._cachedBusyDelays = {};
 			this.byId("reportPage").setBusyIndicatorDelay(0);
 			this._notices = {};
 			this._allPlantRows = [];
@@ -87,6 +91,8 @@ sap.ui.define([
 				this._setNotice("validation", oDateRange.error, "Warning");
 				return;
 			}
+			this._appliedPoFilter = sPo;
+			this._poSelectionSource = sPo ? "input" : "none";
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
 			this._setDetailPanelState(sPlant, sPo || sPlant);
@@ -153,6 +159,8 @@ sap.ui.define([
 			this._activePlant = "";
 			this._activePlantName = "";
 			this._activePo = "";
+			this._appliedPoFilter = "";
+			this._poSelectionSource = "none";
 			this._grnDateFrom = null;
 			this._grnDateTo = null;
 			this._notices = {};
@@ -187,8 +195,41 @@ sap.ui.define([
 		onPoSuggestionSelected: function(oEvent) {
 			var oItem = oEvent.getParameter("selectedItem");
 			if (oItem) {
+				this._poSelectionSource = "input";
 				this.byId("poInput").setValue(oItem.getKey());
+				this._syncPoSelection(this._activePlant, oItem.getKey());
 			}
+		},
+
+		onPoInputLiveChange: function(oEvent) {
+			var sPo = String(oEvent.getParameter("value") || "").trim();
+			var bClearedAppliedPo = !sPo && !!this._appliedPoFilter;
+			this._poSelectionSource = sPo ? "input" : "none";
+			this._syncPoSelection(this._activePlant, sPo);
+			if (bClearedAppliedPo) {
+				this.onGo();
+			}
+		},
+
+		onDateFilterChange: function(oEvent) {
+			var oDatePicker = oEvent.getSource();
+			var sClearId = oDatePicker === this.byId("grnDateFrom") ? "grnDateFromClear" : "grnDateToClear";
+			this.byId(sClearId).setVisible(!!oDatePicker.getValue().trim());
+		},
+
+		onClearDateFrom: function() {
+			this._clearDatePicker("grnDateFrom", "grnDateFromClear");
+		},
+
+		onClearDateTo: function() {
+			this._clearDatePicker("grnDateTo", "grnDateToClear");
+		},
+
+		_clearDatePicker: function(sPickerId, sButtonId) {
+			var oDatePicker = this.byId(sPickerId);
+			oDatePicker.setDateValue(null);
+			oDatePicker.setValue("");
+			this.byId(sButtonId).setVisible(false);
 		},
 
 		onPlantSelect: function(oEvent) {
@@ -209,6 +250,8 @@ sap.ui.define([
 			this._updateCharts([oRow]);
 			this._setPoSummary(oRow);
 			this._activePo = "";
+			this._appliedPoFilter = "";
+			this._poSelectionSource = "none";
 			this._grnRangeRows = [];
 			this._grnRangeLoaded = false;
 			this._setDetailPanelState(oRow.werks, oRow.werks);
@@ -257,9 +300,11 @@ sap.ui.define([
 			this._grnDateFrom = oDateRange.from;
 			this._grnDateTo = oDateRange.to;
 			this._activePo = oRow.ebeln;
+			this._appliedPoFilter = "";
+			this._poSelectionSource = "table";
 			this.byId("poPanel").setExpanded(true);
 			this.byId("grnPanel").setExpanded(true);
-			this.byId("poInput").setValue(oRow.ebeln);
+			this.byId("poInput").setValue("");
 			this.byId("selectedPo").setText("PO: " + oRow.ebeln);
 			this._pendingPoSelection = null;
 			this._loadGrns(this._activePlant, oRow.ebeln);
@@ -269,11 +314,17 @@ sap.ui.define([
 		_loadPos: function(sPlant) {
 			if (Object.prototype.hasOwnProperty.call(this._poCache, sPlant)) {
 				this._cancelTableRead("poData", "poTable");
-				this._setTableNoData(this.byId("poTable"), "No purchase orders found for plant " + sPlant + ".");
-				this._poSourceRows = this._poCache[sPlant];
-				this._setRows("poData", this._poSourceRows);
-				this._applyPoDateFilter();
-				this._setNotice("poData-error", "", "Error");
+				var aCachedPoRows = this._poCache[sPlant];
+				this._showCachedData("poTable", function() {
+					if (this._activePlant !== sPlant) {
+						return;
+					}
+					this._setTableNoData(this.byId("poTable"), "No purchase orders found for plant " + sPlant + ".");
+					this._poSourceRows = aCachedPoRows;
+					this._setRows("poData", this._poSourceRows);
+					this._applyPoDateFilter();
+					this._setNotice("poData-error", "", "Error");
+				}.bind(this));
 				return;
 			}
 			this._read("poData", "poTable", "/es_powiseset", [this._eq("werks", sPlant)],
@@ -290,15 +341,23 @@ sap.ui.define([
 		_applyPoDateFilter: function() {
 			var aPoRows = this._poSourceRows || [];
 			if (!this._grnDateFrom && !this._grnDateTo) {
-				this._setTableNoData(this.byId("poTable"), "No purchase orders found for the selected plant.");
-				this._setRows("poData", aPoRows);
+				var aAllPoRows = this._filterPoRowsByInput(aPoRows);
+				this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
+					"No purchase order found for " + this._appliedPoFilter + "." : "No purchase orders found for the selected plant.");
+				this._setRows("poData", aAllPoRows);
+				if (this._appliedPoFilter) {
+					this._setPoSummaryFromRows(aAllPoRows);
+				}
 				return;
 			}
 			if (!this._grnRangeLoaded) {
-				this._setTableNoData(this.byId("poTable"), "Loading purchase orders with GRN documents in the selected date range.");
-				this._setRows("poData", aPoRows);
-				this._setPoSummaryFromRows(aPoRows);
-				this._syncPoSelection(this._activePlant, this.byId("poInput").getValue().trim());
+				var aPendingPoRows = this._filterPoRowsByInput(aPoRows);
+				this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
+					"No matching PO is available for the selected date range." :
+					"Loading purchase orders with GRN documents in the selected date range.");
+				this._setRows("poData", aPendingPoRows);
+				this._setPoSummaryFromRows(aPendingPoRows);
+				this._syncPoSelection(this._activePlant, this._getPoSelectionValue());
 				return;
 			}
 			var mPoDocuments = Object.create(null);
@@ -320,7 +379,7 @@ sap.ui.define([
 					status: sStatus
 				};
 			});
-			var aFilteredPoRows = aPoRows.reduce(function(aResult, oPo) {
+			var aDateFilteredPoRows = aPoRows.reduce(function(aResult, oPo) {
 				var mDocuments = mPoDocuments[String(oPo.ebeln || "")];
 				if (!mDocuments) {
 					return aResult;
@@ -351,10 +410,22 @@ sap.ui.define([
 				aResult.push(Object.assign({}, oPo, oCounts));
 				return aResult;
 			}, []);
-			this._setTableNoData(this.byId("poTable"), "No purchase orders have GRN documents in the selected date range.");
+			var aFilteredPoRows = this._filterPoRowsByInput(aDateFilteredPoRows);
+			this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
+				"No GRN documents for PO " + this._appliedPoFilter + " match the selected date range." :
+				"No purchase orders have GRN documents in the selected date range.");
 			this._setRows("poData", aFilteredPoRows);
 			this._setPoSummaryFromRows(aFilteredPoRows);
-			this._syncPoSelection(this._activePlant, this.byId("poInput").getValue().trim());
+			this._syncPoSelection(this._activePlant, this._getPoSelectionValue());
+		},
+
+		_filterPoRowsByInput: function(aRows) {
+			if (!this._appliedPoFilter) {
+				return aRows || [];
+			}
+			return (aRows || []).filter(function(oRow) {
+				return String(oRow.ebeln || "") === this._appliedPoFilter;
+			}.bind(this));
 		},
 
 		_setPoSummaryFromRows: function(aRows) {
@@ -405,6 +476,10 @@ sap.ui.define([
 			this._syncingPoSelection = false;
 		},
 
+		_getPoSelectionValue: function() {
+			return this._poSelectionSource === "table" ? this._activePo : this.byId("poInput").getValue().trim();
+		},
+
 		_applyPendingPoSelection: function() {
 			var oPending = this._pendingPoSelection;
 			if (oPending && oPending.plant === this._activePlant && oPending.po === this.byId("poInput").getValue().trim()) {
@@ -433,7 +508,12 @@ sap.ui.define([
 			var sCacheKey = [sPlant, sQueryPo || "*", sFrom, sTo].join("\u001f");
 			if (Object.prototype.hasOwnProperty.call(this._grnCache, sCacheKey)) {
 				this._cancelTableRead("grnData", "grnTable");
-				this._showGrnRows(this._grnCache[sCacheKey], sPlant, sPo, bHasDateRange);
+				var aCachedGrnRows = this._grnCache[sCacheKey];
+				this._showCachedData("grnTable", function() {
+					if (this._activePlant === sPlant) {
+						this._showGrnRows(aCachedGrnRows, sPlant, sPo, bHasDateRange);
+					}
+				}.bind(this));
 				return;
 			}
 			var aFilters = [this._eq("werks", sPlant)];
@@ -835,6 +915,41 @@ sap.ui.define([
 			}.bind(this)));
 		},
 
+		_showCachedData: function(sTableId, fnDisplay) {
+			this._cancelCachedDisplay(sTableId);
+			var oTable = this.byId(sTableId);
+			var iDisplayId = (this._cachedDisplayIds[sTableId] || 0) + 1;
+			this._cachedDisplayIds[sTableId] = iDisplayId;
+			this._cachedBusyDelays[sTableId] = oTable.getBusyIndicatorDelay();
+			oTable.setBusyIndicatorDelay(0);
+			oTable.setBusy(true);
+			this._beginMainBusy("cache:" + sTableId);
+			setTimeout(function() {
+				if (this._cachedDisplayIds[sTableId] !== iDisplayId) {
+					return;
+				}
+				try {
+					fnDisplay();
+				} finally {
+					oTable.setBusy(false);
+					oTable.setBusyIndicatorDelay(this._cachedBusyDelays[sTableId]);
+					delete this._cachedBusyDelays[sTableId];
+					this._endMainBusy("cache:" + sTableId);
+				}
+			}.bind(this), 120);
+		},
+
+		_cancelCachedDisplay: function(sTableId) {
+			this._cachedDisplayIds[sTableId] = (this._cachedDisplayIds[sTableId] || 0) + 1;
+			var oTable = this.byId(sTableId);
+			if (oTable && this._cachedBusyDelays[sTableId] !== undefined) {
+				oTable.setBusy(false);
+				oTable.setBusyIndicatorDelay(this._cachedBusyDelays[sTableId]);
+				delete this._cachedBusyDelays[sTableId];
+			}
+			this._endMainBusy("cache:" + sTableId);
+		},
+
 		_read: function(sModelName, sTableId, sPath, aFilters, sEmptyText, fnSuccess) {
 			var oModel = this.getOwnerComponent().getModel();
 			var oTable = this.byId(sTableId);
@@ -849,6 +964,7 @@ sap.ui.define([
 			if (this._requestActive[sModelName] && this._requestSignatures[sModelName] === sSignature) {
 				return;
 			}
+			this._cancelCachedDisplay(sTableId);
 			var iRequestId = (this._requestIds[sModelName] || 0) + 1;
 			this._requestIds[sModelName] = iRequestId;
 			this._requestActive[sModelName] = iRequestId;
@@ -961,6 +1077,7 @@ sap.ui.define([
 		},
 
 		_clearTable: function(sModelName, sTableId, sText) {
+			this._cancelCachedDisplay(sTableId);
 			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
 			delete this._requestActive[sModelName];
 			delete this._requestSignatures[sModelName];
@@ -976,6 +1093,7 @@ sap.ui.define([
 		},
 
 		_cancelTableRead: function(sModelName, sTableId) {
+			this._cancelCachedDisplay(sTableId);
 			this._requestIds[sModelName] = (this._requestIds[sModelName] || 0) + 1;
 			delete this._requestActive[sModelName];
 			delete this._requestSignatures[sModelName];
