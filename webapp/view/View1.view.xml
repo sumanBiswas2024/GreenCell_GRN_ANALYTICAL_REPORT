@@ -21,12 +21,20 @@
 							</VBox>
 							<VBox class="filterField"><Label text="PO Number"/>
 								<Input id="poInput" placeholder="Select a plant first" showClearIcon="true" showSuggestion="true" filterSuggests="true" startSuggestion="1"
-									liveChange="onPoInputLiveChange" suggestionItemSelected="onPoSuggestionSelected" suggestionItems="{poData>/rows}">
-									<suggestionItems><core:ListItem key="{poData>ebeln}" text="{poData>ebeln}" additionalText="{poData>lifnr_name}"/></suggestionItems>
+									suggestionItemSelected="onPoSuggestionSelected" suggestionItems="{poChoices>/rows}">
+									<suggestionItems><core:ListItem key="{poChoices>ebeln}" text="{poChoices>ebeln}" additionalText="{poChoices>lifnr_name}"/></suggestionItems>
 								</Input>
 							</VBox>
-							<VBox class="filterField dateField"><Label text="GRN Date From"/><HBox class="datePickerField"><DatePicker id="grnDateFrom" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/><Button id="grnDateFromClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date From" visible="false" press="onClearDateFrom"/></HBox></VBox>
-							<VBox class="filterField dateField"><Label text="GRN Date To"/><HBox class="datePickerField"><DatePicker id="grnDateTo" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd" placeholder="DD.MM.YYYY"/><Button id="grnDateToClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date To" visible="false" press="onClearDateTo"/></HBox></VBox>
+							<VBox class="filterField dateField"><Label text="GRN Date From"/>
+								<HBox class="datePickerField"><DatePicker id="grnDateFrom" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd"
+									placeholder="DD.MM.YYYY"/><Button id="grnDateFromClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date From"
+									visible="false" press="onClearDateFrom"/></HBox>
+							</VBox>
+							<VBox class="filterField dateField"><Label text="GRN Date To"/>
+								<HBox class="datePickerField"><DatePicker id="grnDateTo" width="100%" change="onDateFilterChange" displayFormat="dd.MM.yyyy" valueFormat="yyyy-MM-dd"
+									placeholder="DD.MM.YYYY"/><Button id="grnDateToClear" icon="sap-icon://decline" type="Transparent" class="dateClearButton" tooltip="Clear GRN Date To" visible="false"
+									press="onClearDateTo"/></HBox>
+							</VBox>
 							<VBox class="filterActions"><Button text="Go" type="Emphasized" icon="sap-icon://search" press="onGo"/><Button text="Reset" press="onReset"/></VBox>
 						</HBox>
 						<!--<Text text="Leave Plant blank to load all plants. GRN date range filters document details; select a plant and PO to view them."-->
@@ -39,13 +47,41 @@
 						</headerToolbar>
 						<content>
 							<HBox wrap="Wrap" class="kpiRow">
-								<VBox class="kpiCard kpiBlue"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://factory" class="kpiIcon"/><VBox class="kpiText"><Text text="TOTAL PLANTS" class="kpiLabel"/><ObjectNumber number="{summary>/plantCount}"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiCyan"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sales-order" class="kpiIcon"/><VBox class="kpiText"><Text text="TOTAL POs" class="kpiLabel"/><ObjectNumber number="{summary>/poCount}"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiTeal"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://documents" class="kpiIcon"/><VBox class="kpiText"><Text text="MATERIAL DOCUMENTS" class="kpiLabel"/><ObjectNumber number="{summary>/documentCount}"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiGreen"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-positive" class="kpiIcon"/><VBox class="kpiText"><Text text="COMPLETED" class="kpiLabel"/><ObjectNumber number="{summary>/completed}" state="Success"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiAmber"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://pending" class="kpiIcon"/><VBox class="kpiText"><Text text="PENDING" class="kpiLabel"/><ObjectNumber number="{summary>/pending}" state="Warning"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiRed"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-negative" class="kpiIcon"/><VBox class="kpiText"><Text text="REJECTED" class="kpiLabel"/><ObjectNumber number="{summary>/rejected}" state="Error"/></VBox></HBox></VBox>
-								<VBox class="kpiCard kpiSlate"><HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sys-cancel" class="kpiIcon"/><VBox class="kpiText"><Text text="CANCELLED" class="kpiLabel"/><ObjectNumber number="{summary>/cancelled}"/></VBox></HBox></VBox>
+								<VBox class="kpiCard kpiBlue">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://factory" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="TOTAL PLANTS" class="kpiLabel"/><ObjectNumber number="{summary>/plantCount}"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiCyan">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sales-order" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="TOTAL POs" class="kpiLabel"/><ObjectNumber number="{summary>/poCount}"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiTeal">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://documents" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="MATERIAL DOCUMENTS" class="kpiLabel"/><ObjectNumber number="{summary>/documentCount}"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiGreen">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-positive" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="COMPLETED" class="kpiLabel"/><ObjectNumber number="{summary>/completed}" state="Success"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiAmber">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://pending" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="PENDING" class="kpiLabel"/><ObjectNumber number="{summary>/pending}" state="Warning"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiRed">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://status-negative" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="REJECTED" class="kpiLabel"/><ObjectNumber number="{summary>/rejected}" state="Error"/></VBox>
+									</HBox>
+								</VBox>
+								<VBox class="kpiCard kpiSlate">
+									<HBox class="kpiContent" alignItems="Center"><core:Icon src="sap-icon://sys-cancel" class="kpiIcon"/>
+										<VBox class="kpiText"><Text text="CANCELLED" class="kpiLabel"/><ObjectNumber number="{summary>/cancelled}"/></VBox>
+									</HBox>
+								</VBox>
 							</HBox>
 							<HBox wrap="NoWrap" class="plantDashboard">
 								<VBox class="dashboardDetails">
@@ -144,8 +180,8 @@
 							</Toolbar>
 						</headerToolbar>
 						<table:Table id="poTable" class="fixedDataTable" rows="{poData>/rows}" width="100%" height="25rem" visibleRowCount="10"
-							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="RowOnly" rowSelectionChange="onPoSelect" enableColumnReordering="false"
-							enableBusyIndicator="true" busyIndicatorDelay="150">
+							visibleRowCountMode="Fixed" selectionMode="Single" selectionBehavior="RowOnly" rowSelectionChange="onPoSelect"
+							enableColumnReordering="false" enableBusyIndicator="true" busyIndicatorDelay="150">
 							<table:noData><Text text="Select a plant to load purchase orders"/></table:noData>
 							<table:columns>
 								<table:Column width="10rem">
@@ -162,7 +198,7 @@
 								</table:Column>
 								<table:Column width="9rem">
 									<table:label><Label text="PO Date"/></table:label>
-										<table:template><Text text="{path: 'poData>bedat', formatter: '.formatDate'}"/></table:template>
+									<table:template><Text text="{path: 'poData>bedat', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="8rem" hAlign="End">
 									<table:label><Label text="GRN Docs"/></table:label>
@@ -211,7 +247,8 @@
 								<ObjectStatus id="grnRejectedCount" text="Rejected: {grnSummary>/rejected}" state="Error" class="grnToolbarMetric"/>
 								<ObjectStatus id="grnCancelledCount" text="Cancelled: {grnSummary>/cancelled}" class="grnToolbarMetric"/>
 								<ToolbarSpacer/>
-								<Select id="grnStatusFilter" class="grnStatusFilter" width="9rem" selectedKey="ALL" change="onGrnStatusChange" tooltip="Filter GRN documents by status">
+								<Select id="grnStatusFilter" class="grnStatusFilter" width="9rem" selectedKey="ALL" change="onGrnStatusChange"
+									tooltip="Filter GRN documents by status">
 									<items>
 										<core:Item key="ALL" text="All statuses"/>
 										<core:Item key="COMPLETED" text="Completed"/>
@@ -278,11 +315,11 @@
 								</table:Column>
 								<table:Column width="10rem">
 									<table:label><Label text="GRN Date"/></table:label>
-										<table:template><Text text="{path: 'grnData>budat', formatter: '.formatDate'}"/></table:template>
+									<table:template><Text text="{path: 'grnData>budat', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="10rem">
 									<table:label><Label text="Post Date"/></table:label>
-										<table:template><Text text="{path: 'grnData>budat_mkpf', formatter: '.formatDate'}"/></table:template>
+									<table:template><Text text="{path: 'grnData>budat_mkpf', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
 								<table:Column width="8rem">
 									<table:label><Label text="Time"/></table:label>

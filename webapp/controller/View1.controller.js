@@ -13,6 +13,7 @@ sap.ui.define([
 			this.getView().setModel(this._createRowsModel(), "plantData");
 			this.getView().setModel(this._createRowsModel(), "plantChoices");
 			this.getView().setModel(this._createRowsModel(), "poData");
+			this.getView().setModel(this._createRowsModel(), "poChoices");
 			this.getView().setModel(this._createRowsModel(), "grnData");
 			this.getView().setModel(new JSONModel({
 				rows: []
@@ -129,6 +130,7 @@ sap.ui.define([
 				this._requestIds.plantData = (this._requestIds.plantData || 0) + 1;
 				delete this._requestActive.plantData;
 				this.byId("poInput").setPlaceholder("Select a plant first");
+				this._setRows("poChoices", []);
 				this._loadAllPlants(false);
 				this._clearTable("poData", "poTable", "Choose a plant to load its purchase orders.");
 				this._clearTable("grnData", "grnTable", "Choose a plant to load GRN documents.");
@@ -175,6 +177,7 @@ sap.ui.define([
 			this._setDetailPanelState("", "");
 			this._clearTable("plantData", "plantTable", "Loading all plants…");
 			this._clearTable("poData", "poTable", "Choose a plant to load its purchase orders.");
+			this._setRows("poChoices", []);
 			this._clearTable("grnData", "grnTable", "Choose a plant to load GRN documents.");
 			this.byId("grnFooter").setText("Select a plant to view GRN documents.");
 			this._allPlantsLoaded = false;
@@ -198,16 +201,6 @@ sap.ui.define([
 				this._poSelectionSource = "input";
 				this.byId("poInput").setValue(oItem.getKey());
 				this._syncPoSelection(this._activePlant, oItem.getKey());
-			}
-		},
-
-		onPoInputLiveChange: function(oEvent) {
-			var sPo = String(oEvent.getParameter("value") || "").trim();
-			var bClearedAppliedPo = !sPo && !!this._appliedPoFilter;
-			this._poSelectionSource = sPo ? "input" : "none";
-			this._syncPoSelection(this._activePlant, sPo);
-			if (bClearedAppliedPo) {
-				this.onGo();
 			}
 		},
 
@@ -342,6 +335,7 @@ sap.ui.define([
 			var aPoRows = this._poSourceRows || [];
 			if (!this._grnDateFrom && !this._grnDateTo) {
 				var aAllPoRows = this._filterPoRowsByInput(aPoRows);
+				this._setRows("poChoices", aPoRows);
 				this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
 					"No purchase order found for " + this._appliedPoFilter + "." : "No purchase orders found for the selected plant.");
 				this._setRows("poData", aAllPoRows);
@@ -352,6 +346,7 @@ sap.ui.define([
 			}
 			if (!this._grnRangeLoaded) {
 				var aPendingPoRows = this._filterPoRowsByInput(aPoRows);
+				this._setRows("poChoices", aPoRows);
 				this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
 					"No matching PO is available for the selected date range." :
 					"Loading purchase orders with GRN documents in the selected date range.");
@@ -410,6 +405,7 @@ sap.ui.define([
 				aResult.push(Object.assign({}, oPo, oCounts));
 				return aResult;
 			}, []);
+			this._setRows("poChoices", aDateFilteredPoRows);
 			var aFilteredPoRows = this._filterPoRowsByInput(aDateFilteredPoRows);
 			this._setTableNoData(this.byId("poTable"), this._appliedPoFilter ?
 				"No GRN documents for PO " + this._appliedPoFilter + " match the selected date range." :
