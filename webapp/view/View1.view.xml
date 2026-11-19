@@ -313,13 +313,13 @@
 									<table:label><Label text="GRN Date"/></table:label>
 									<table:template><Text text="{path: 'grnData>budat', formatter: '.formatDate'}"/></table:template>
 								</table:Column>
-								<table:Column width="10rem">
-									<table:label><Label text="Post Date"/></table:label>
-									<table:template><Text text="{path: 'grnData>budat_mkpf', formatter: '.formatDate'}"/></table:template>
-								</table:Column>
+								<!--<table:Column width="10rem">-->
+								<!--	<table:label><Label text="Post Date"/></table:label>-->
+								<!--	<table:template><Text text="{path: 'grnData>budat_mkpf', formatter: '.formatDate'}"/></table:template>-->
+								<!--</table:Column>-->
 								<table:Column width="8rem">
 									<table:label><Label text="Time"/></table:label>
-									<table:template><Text text="{grnData>cputm}"/></table:template>
+									<table:template><Text text="{path: 'grnData>cputm', formatter: '.formatTime'}"/></table:template>
 								</table:Column>
 								<table:Column width="8rem">
 									<table:label><Label text="Storage"/></table:label>

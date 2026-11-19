@@ -660,6 +660,33 @@ sap.ui.define([
 			return sDate;
 		},
 
+		formatTime: function(vTime) {
+			if (vTime == null || vTime === "") {
+				return "";
+			}
+			var sTime = String(vTime).trim();
+			var aMatch = /^(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.\d+)?$/.exec(sTime);
+			if (aMatch) {
+				var iHours = Number(aMatch[1]);
+				var iMinutes = Number(aMatch[2]);
+				var iSeconds = Number(aMatch[3]);
+				if (iHours < 24 && iMinutes < 60 && iSeconds < 60) {
+					return this._padDatePart(iHours) + ":" + this._padDatePart(iMinutes) + ":" + this._padDatePart(iSeconds);
+				}
+				return sTime;
+			}
+			if (/^\d{1,6}$/.test(sTime)) {
+				var sDigits = sTime.padStart(6, "0");
+				var iSapHours = Number(sDigits.slice(0, 2));
+				var iSapMinutes = Number(sDigits.slice(2, 4));
+				var iSapSeconds = Number(sDigits.slice(4, 6));
+				if (iSapHours < 24 && iSapMinutes < 60 && iSapSeconds < 60) {
+					return sDigits.slice(0, 2) + ":" + sDigits.slice(2, 4) + ":" + sDigits.slice(4, 6);
+				}
+			}
+			return sTime;
+		},
+
 		_padDatePart: function(vPart) {
 			return String(vPart).padStart(2, "0");
 		},
